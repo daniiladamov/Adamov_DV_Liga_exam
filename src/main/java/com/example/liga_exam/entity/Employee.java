@@ -7,12 +7,23 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@DiscriminatorValue("employee")
 @Getter
 @Setter
-public class Employee extends User{
+@Table(name = "empoyees")
+public class Employee{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "box_id",referencedColumnName = "id")
     @NotNull
     private Box box;
+
+    @OneToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @NotNull
+    private User user;
+
+
 }
