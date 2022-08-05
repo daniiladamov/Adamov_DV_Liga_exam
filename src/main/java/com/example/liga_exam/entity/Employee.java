@@ -7,10 +7,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@DiscriminatorValue("operator")
+@DiscriminatorValue("employee")
 @Getter
 @Setter
-public class Operator extends User{
+public class Employee extends User{
     @ManyToOne
     @JoinColumn(name = "box_id",referencedColumnName = "id")
     @NotNull

@@ -7,6 +7,8 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Set;
 
 @Entity
@@ -14,13 +16,26 @@ import java.util.Set;
 @Setter
 @Table(name="orders")
 public class Order {
-
-    //@todo: декомпозиция!
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToMany
+
+    @Column(name="start_time")
+    private LocalTime startTime;
+
+    @Column(name="end_time")
+    private LocalTime endTime;
+
+    @Column(name="date")
+    private LocalDate date;
+
+    @Column(columnDefinition = "boolean default true")
+    private boolean active;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean done;
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "order_service",
             joinColumns = @JoinColumn(name="order_id"),
@@ -28,14 +43,14 @@ public class Order {
     )
     @Fetch(FetchMode.SUBSELECT)
     private Set<Service> services;
+
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull
     private User user;
-    @Column(columnDefinition = "boolean default false")
-    private boolean canceled;
-    @OneToOne
-    @JoinColumn(name = "reservation_id",referencedColumnName = "id")
+
+    @ManyToOne
+    @JoinColumn(name = "box_id", referencedColumnName = "id")
     @NotNull
-    private Reservation reservation;
+    private Box box;
 }

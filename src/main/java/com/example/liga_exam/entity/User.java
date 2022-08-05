@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 @Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"username"}))
 @DiscriminatorColumn(name = "user_type")
+@DiscriminatorValue("user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

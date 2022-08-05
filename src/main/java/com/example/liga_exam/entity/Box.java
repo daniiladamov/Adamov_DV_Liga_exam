@@ -28,5 +28,5 @@ public class Box {
     @Column(columnDefinition = "time default '20:00'")
     private Time close;
     @OneToMany(mappedBy = "box", fetch = FetchType.LAZY)
-    private Set<Operator> operators;
+    private Set<Employee> employees;
 }
