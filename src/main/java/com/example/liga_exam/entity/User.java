@@ -14,24 +14,29 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"username"}))
-@DiscriminatorColumn(name = "user_type")
-@DiscriminatorValue("user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     private String firstName;
+
     @NotNull
     private String lastName;
+
     private String surname;
+
     @NotNull
     private String username;
+
     @NotNull
     private String password;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Order> orders;

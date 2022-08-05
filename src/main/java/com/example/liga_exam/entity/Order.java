@@ -35,7 +35,7 @@ public class Order {
     @Column(columnDefinition = "boolean default false")
     private boolean done;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "order_service",
             joinColumns = @JoinColumn(name="order_id"),

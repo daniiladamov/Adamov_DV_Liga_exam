@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Set;
 
 @Entity
@@ -17,16 +18,16 @@ public class Box {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     private double ratio;
-    @Basic
-    @DateTimeFormat(pattern = "HH:mm")
+
     @Column(columnDefinition = "time default '08:00'")
-    private Time open;
-    @Basic
-    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime open;
+
     @Column(columnDefinition = "time default '20:00'")
-    private Time close;
+    private LocalTime close;
+    
     @OneToMany(mappedBy = "box", fetch = FetchType.LAZY)
     private Set<Employee> employees;
 }
