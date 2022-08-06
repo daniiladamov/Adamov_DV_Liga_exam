@@ -17,4 +17,6 @@ public interface OrderService {
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService);
 
     void cancel(Long id);
+
+    Order getOrder(Long id);
 }
