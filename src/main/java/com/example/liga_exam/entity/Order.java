@@ -1,6 +1,8 @@
 package com.example.liga_exam.entity;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -15,6 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name="orders")
+@Builder
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,12 +40,12 @@ public class Order {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
-            name = "order_service",
+            name = "order_operation",
             joinColumns = @JoinColumn(name="order_id"),
-            inverseJoinColumns = @JoinColumn(name ="service_id")
+            inverseJoinColumns = @JoinColumn(name ="operation_id")
     )
     @Fetch(FetchMode.SUBSELECT)
-    private Set<Service> services;
+    private Set<Operation> operations;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

@@ -10,12 +10,12 @@ import javax.persistence.criteria.Root;
 import java.time.LocalTime;
 
 public class BoxSpecification {
-//    public static Specification<Box> freeBoxes(LocalTime time){
-//        return new Specification<Box>() {
-//            @Override
-//            public Predicate toPredicate(Root<Box> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-//
-//            }
-//        };
-//    }
+    public static Specification<Box> freeBoxes(LocalTime time){
+        return new Specification<Box>() {
+            @Override
+            public Predicate toPredicate(Root<Box> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+return null;
+            }
+        };
+    }
 }

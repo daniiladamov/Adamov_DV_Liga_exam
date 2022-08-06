@@ -21,6 +21,6 @@ public class BoxController {
     @PostMapping
     public Long createBox(@Validated @RequestBody BoxReqDto boxReqDto){
         Box box=boxMapper.toEntity(boxReqDto);
-        return boxService.saveBox(box);
+        return boxService.createBox(box);
     }
 }
