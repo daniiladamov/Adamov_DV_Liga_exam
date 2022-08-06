@@ -7,8 +7,9 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        uses = {ServiceMapper.class, BoxMapper.class, UserMapper.class})
+        uses = {OperationMapper.class, BoxMapper.class, UserMapper.class})
 public interface OrderMapper {
     Order toEntity(OrderReqDto orderReqDto);
+
     OrderResDto toResponse(Order order);
 }
