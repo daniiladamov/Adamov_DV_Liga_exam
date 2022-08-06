@@ -2,13 +2,14 @@ package com.example.liga_exam.repository;
 
 import com.example.liga_exam.entity.Box;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface BoxRepo extends JpaRepository<Box, Long> {
+public interface BoxRepo extends JpaRepository<Box, Long>, JpaSpecificationExecutor<Box> {
 
     @Query(value = """
             select distinct b.* from boxes b

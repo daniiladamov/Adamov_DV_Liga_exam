@@ -1,15 +1,16 @@
 package com.example.liga_exam.controller;
 
 import com.example.liga_exam.dto.request.BoxReqDto;
+import com.example.liga_exam.dto.request.OrderSearch;
+import com.example.liga_exam.dto.response.BoxResDto;
 import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.mapper.BoxMapper;
 import com.example.liga_exam.service.BoxService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/boxes")

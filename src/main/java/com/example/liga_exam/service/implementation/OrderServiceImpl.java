@@ -1,14 +1,20 @@
 package com.example.liga_exam.service.implementation;
 
+import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.entity.Operation;
 import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.entity.User;
-import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.repository.OrderRepo;
+import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.service.OrderService;
+import com.example.liga_exam.specification.OrderSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -35,6 +41,15 @@ public class OrderServiceImpl implements OrderService {
         order.setEndTime(endTime);
         return orderRepo.save(order).getId();
     }
+    @Override
+    public Page<Order> getOrders(OrderSearch orderSearch,Pageable pageable, BoxService boxService) {
+        OrderSpecification orderSpecification=new OrderSpecification(orderSearch,boxService);
+        return orderRepo.findAll(Specification.where(orderSpecification), pageable);
 
+    }
 
+    @Override
+    public void cancel(Long id) {
+
+    }
 }

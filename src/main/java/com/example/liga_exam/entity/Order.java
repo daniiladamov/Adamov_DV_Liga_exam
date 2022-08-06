@@ -17,7 +17,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name="orders")
-@Builder
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
