@@ -12,24 +12,22 @@ import java.util.List;
 public interface BoxRepo extends JpaRepository<Box, Long>, JpaSpecificationExecutor<Box> {
 
     @Query(value = """
-            select distinct b.* from boxes b
-                              left join orders o  on b.id =o.box_id
-                              where (o."date" != :date or o."date" is null) 
-                              or (
-                              o.active = true
-                              and not(
-                              o.start_time <= make_time(:h, :m,0) and  make_time(:h, :m,0)<o.end_time
-                              or
-                              (o.start_time < make_time(:h, :m,0) +make_interval(mins=>cast((b.ratio *:duration)+1  
-                              as int))
-                              and make_time(:h, :m,0) +make_interval(mins=>cast(ceil(b.ratio *:duration) as int)) <=
-                              o.end_time))
-                              and
-                              ( (make_time(:h, :m,0) between b."open" and b."close") and
-                             	make_time(:h, :m,0) +make_interval(mins=>cast(ceil(b.ratio *:duration) as int)) 
-                             	between b."open" and b."close")
-                              )
-                    """ , nativeQuery = true)
+select distinct b.* from boxes b
+where
+((make_time(:h, :m,0) between b."open" and b."close") and
+cast(make_time(:h, :m,0) +interval '1 minute'*cast(ceil(b.ratio *:duration) as int) as time)
+between b."open" and b."close")
+
+except
+
+select bx.* from boxes bx join orders o  on bx.id =o.box_id
+where
+o."date" =:date and o.active = true and 
+(o.start_time <= make_time(:h, :m,0) and  make_time(:h, :m,0)<o.end_time)
+or
+(o.start_time < cast(make_time(:h, :m,0) +cast(ceil(bx.ratio *:duration)  as int)*interval '1 minute' as time)
+and cast(make_time(:h, :m,0) +cast(ceil(bx.ratio *:duration) as int)*interval '1 minute'as time) <=o.end_time)
+""" , nativeQuery = true)
     List<Box> getFreeBoxes(@Param("date") LocalDate date,
                            @Param("h") int hour,
                            @Param("m") int minute,

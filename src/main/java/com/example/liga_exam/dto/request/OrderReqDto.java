@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
@@ -22,6 +23,6 @@ public class OrderReqDto {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate date;
 
-    @NotBlank
+    @Size(min = 1)
     private Set<OperationReqDto> services;
 }

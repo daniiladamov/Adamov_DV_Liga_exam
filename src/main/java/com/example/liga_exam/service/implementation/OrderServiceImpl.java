@@ -39,30 +39,17 @@ public class OrderServiceImpl implements OrderService {
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
-
-    private static final String REMARK_FOR_BOX = "В Box#%d услуги выполняются с отклонением от графика";
-    private static final String EXCEPTION_TIME = "Нельзя завершать услугу до времени ее начала - %s";
-    private static final String CANCELED_ORDER = "Заказ был отменен ранее, операция недоступна";
-    private static final String DONE_ORDER = "Заказ был выполнен ранее, операция недоступна";
-    private static final String INVALID_INTERVAL = "Временной интервал задан неверно";
-    private static final String INVALID_DISCOUNT="Можно назначать скидку в пределах %d% - %d%";
-    private static final String DISCOUNT_NOT_AVAILABLE="Работнику запрещено назначать скидку";
+    @Value("${time_period}")
+    private Long timeInterval;
 
     @Transactional
     @Override
     public Long createOrder(Order order, Set<Operation> operations, User user) {
-        int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
-        LocalTime startTime = order.getStartTime();
-        List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(), startTime.getHour(), startTime.getMinute(), duration);
-        Collections.shuffle(freeBoxes);
-        order.setBox(freeBoxes.get(0));
+        checkOrderDataTime(order)
+                .setFreeBox(order, operations)
+                .setCost(order, operations);
         order.setUser(user);
-        BigDecimal cost = operations.stream().map(op -> op.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
-        cost.setScale(2, RoundingMode.CEILING);
-        order.setCost(cost);
-        double calculate = duration * freeBoxes.get(0).getRatio();
-        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
-        order.setEndTime(endTime);
+        order.setActive(true);
         return orderRepo.save(order).getId();
     }
 
@@ -110,6 +97,36 @@ public class OrderServiceImpl implements OrderService {
         return order.getCost();
     }
 
+    private OrderServiceImpl setFreeBox(Order order, Set<Operation> operations) {
+        int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
+        LocalTime startTime = order.getStartTime();
+        List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(),
+                startTime.getHour(), startTime.getMinute(), duration);
+        Collections.shuffle(freeBoxes);
+        order.setBox(freeBoxes.get(0));
+        double calculate = duration * freeBoxes.get(0).getRatio();
+        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
+        order.setEndTime(endTime);
+        return this;
+    }
+
+    private OrderServiceImpl checkOrderDataTime(Order order) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        if (currentDate.compareTo(order.getDate()) < 0)
+            throw new DateTimeException(INVALID_ORDER_DATE);
+        else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L))> 0)
+            throw new DateTimeException(String.format(INVALID_ORDER_TIME,timeInterval));
+        return this;
+    }
+
+    private OrderServiceImpl setCost(Order order, Set<Operation> operations) {
+        BigDecimal cost = operations.stream().map(op -> op.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
+        cost.setScale(2, RoundingMode.CEILING);
+        order.setCost(cost);
+        return this;
+    }
+
     private OrderServiceImpl checkDateOrder(Order order) {
         LocalTime current = LocalTime.now();
         LocalTime start = order.getStartTime();
@@ -125,14 +142,14 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderServiceImpl checkDiscountOrder(Order order, Integer discount, User user) {
         if (Objects.nonNull(discount)) {
-            Employee employee=user.getEmployee();
-            if (Objects.nonNull(employee) && Objects.isNull(employee.getDiscountMin())){
+            Employee employee = user.getEmployee();
+            if (Objects.nonNull(employee) && Objects.isNull(employee.getDiscountMin())) {
                 throw new DiscountException(DISCOUNT_NOT_AVAILABLE);
             }
             if (
                     Objects.nonNull(employee) &&
-                    (discount<employee.getDiscountMin() || discount>employee.getDiscountMax() )
-            ){
+                            (discount < employee.getDiscountMin() || discount > employee.getDiscountMax())
+            ) {
                 throw new DiscountException(String.format(INVALID_DISCOUNT,
                         employee.getDiscountMin(), employee.getDiscountMax()));
             }
