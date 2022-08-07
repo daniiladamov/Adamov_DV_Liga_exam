@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -19,4 +21,6 @@ public interface OrderService {
     void cancel(Long id);
 
     Order getOrder(Long id);
+
+    BigDecimal getRevenue(LocalDate fromDate, LocalDate toDate);
 }

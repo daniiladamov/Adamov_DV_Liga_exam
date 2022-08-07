@@ -9,6 +9,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
@@ -36,6 +37,10 @@ public class Order {
 
     @Column(columnDefinition = "boolean default false")
     private boolean done;
+
+    @NotNull
+    @Column(name="cost")
+    private BigDecimal cost;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(

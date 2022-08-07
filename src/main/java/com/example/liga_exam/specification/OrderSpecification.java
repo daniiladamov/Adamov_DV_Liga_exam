@@ -4,7 +4,6 @@ import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.Order_;
-import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.service.BoxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,5 +41,18 @@ public class OrderSpecification implements Specification<Order> {
              predicates.add(startEqual);
          }
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+    }
+
+    public static Specification<Order> revenuePredicate(LocalDate fromDate, LocalDate toDate) {
+        return (root, query, criteriaBuilder) -> {
+            Predicate predicate=criteriaBuilder.equal(root.get(Order_.done),true);
+            if (Objects.nonNull(fromDate))
+                predicate= criteriaBuilder.and(predicate,
+                        criteriaBuilder.greaterThanOrEqualTo(root.get(Order_.date),fromDate));
+            if (Objects.nonNull(toDate))
+                    predicate=criteriaBuilder.and(predicate,
+                            criteriaBuilder.lessThanOrEqualTo(root.get(Order_.date),toDate));
+            return predicate;
+        };
     }
 }

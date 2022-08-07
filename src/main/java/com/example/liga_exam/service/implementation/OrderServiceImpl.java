@@ -21,9 +21,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -39,13 +44,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Long createOrder(Order order, Set<Operation> operations, User user) {
         int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
+        BigDecimal cost=operations.stream().map(op->op.getCost()).reduce(BigDecimal.ZERO,BigDecimal::add);
+        cost.setScale(2, RoundingMode.CEILING);
         LocalTime startTime = order.getStartTime();
         List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(), startTime.getHour(), startTime.getMinute(), duration);
         Collections.shuffle(freeBoxes);
         order.setBox(freeBoxes.get(0));
         order.setUser(user);
-        double v = duration * freeBoxes.get(0).getRatio();
-        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(v));
+        order.setCost(cost);
+        double calculate = duration * freeBoxes.get(0).getRatio();
+        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
         order.setEndTime(endTime);
         return orderRepo.save(order).getId();
     }
@@ -53,7 +61,6 @@ public class OrderServiceImpl implements OrderService {
     public Page<Order> getOrders(OrderSearch orderSearch,Pageable pageable, BoxService boxService) {
         OrderSpecification orderSpecification=new OrderSpecification(orderSearch,boxService);
         return orderRepo.findAll(Specification.where(orderSpecification), pageable);
-
     }
 
     @Override
@@ -76,4 +83,13 @@ public class OrderServiceImpl implements OrderService {
                 new EntityNotFoundException(exceptionMessage+id));
     }
 
+    @Override
+    public BigDecimal getRevenue(LocalDate fromDate, LocalDate toDate) {
+        if(Objects.nonNull(fromDate) && Objects.nonNull(toDate) && fromDate.compareTo(toDate)>0){
+            throw new DateTimeException("Интервал задан неверно");
+        }
+        List<Order> revenue = orderRepo.findAll(Specification.where(
+                OrderSpecification.revenuePredicate(fromDate, toDate)));
+        return revenue.stream().map(rev->rev.getCost()).reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
 }
