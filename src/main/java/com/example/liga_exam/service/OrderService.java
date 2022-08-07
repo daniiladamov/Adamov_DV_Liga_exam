@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 
 public interface OrderService {
@@ -23,6 +22,7 @@ public interface OrderService {
     String DISCOUNT_NOT_AVAILABLE="Работнику запрещено назначать скидку";
     String INVALID_ORDER_DATE="Запись на прошедшие даты не доступна";
     String INVALID_ORDER_TIME="Запись допступна минимум на %d минут более текущего времени";
+    String NOT_FOUND_FREE_BOXES="Нет свободных мест на выбранные дату и время";
     Long createOrder(Order order, Set<Operation> operations, User user);
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService);
 
@@ -35,4 +35,6 @@ public interface OrderService {
     BigDecimal doneOrder(Long id, Integer discount, User user);
 
     Page<Order> getOrders(Specification<Order> specification, Pageable pageable);
+
+    void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user);
 }

@@ -2,10 +2,7 @@ package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.*;
-import com.example.liga_exam.exception.DiscountException;
-import com.example.liga_exam.exception.EntityNotFoundException;
-import com.example.liga_exam.exception.OrderWasCanceledException;
-import com.example.liga_exam.exception.OrderWasDoneException;
+import com.example.liga_exam.exception.*;
 import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.repository.OrderRepo;
 import com.example.liga_exam.service.BoxService;
@@ -65,6 +62,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = FreeBoxesNotFound.class)
+    public void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user) {
+        Order order=getOrder(id);
+        checkOrderStatus(order);
+        order.setActive(false);
+        orderRepo.save(order);
+        order.setStartTime(updatedOrder.getStartTime());
+        order.setDate(updatedOrder.getDate());
+        createOrder(order,operations,user);
+    }
+
+    @Override
     @Transactional
     public void cancel(Long id) {
         Order order = getOrder(id);
@@ -107,6 +116,8 @@ public class OrderServiceImpl implements OrderService {
         LocalTime startTime = order.getStartTime();
         List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(),
                 startTime.getHour(), startTime.getMinute(), duration);
+        if (freeBoxes.isEmpty())
+            throw new FreeBoxesNotFound(NOT_FOUND_FREE_BOXES);
         Collections.shuffle(freeBoxes);
         order.setBox(freeBoxes.get(0));
         double calculate = duration * freeBoxes.get(0).getRatio();
@@ -118,9 +129,9 @@ public class OrderServiceImpl implements OrderService {
     private OrderServiceImpl checkOrderDataTime(Order order) {
         LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
-        if (currentDate.compareTo(order.getDate()) < 0)
+        if (currentDate.compareTo(order.getDate()) > 0)
             throw new DateTimeException(INVALID_ORDER_DATE);
-        else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L))> 0)
+        else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L)) < 0)
             throw new DateTimeException(String.format(INVALID_ORDER_TIME,timeInterval));
         return this;
     }

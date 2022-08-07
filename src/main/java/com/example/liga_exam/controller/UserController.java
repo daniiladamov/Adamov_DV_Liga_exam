@@ -32,7 +32,7 @@ public class UserController {
     private final OrderMapper orderMapper;
     private final OperationService operationService;
 
-
+//@todo: перенести в OrderController!
     @PostMapping("/{id}/orders")
     public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto, @PathVariable Long id) {
         Set<Operation> operationSet = operationService.getOperations(

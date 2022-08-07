@@ -42,7 +42,7 @@ public class Order {
     @Column(name="cost")
     private BigDecimal cost;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
     @JoinTable(
             name = "order_operation",
             joinColumns = @JoinColumn(name="order_id"),
