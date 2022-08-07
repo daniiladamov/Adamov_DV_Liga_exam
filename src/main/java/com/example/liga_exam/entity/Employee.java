@@ -1,5 +1,6 @@
 package com.example.liga_exam.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +21,7 @@ public class Employee{
     @NotNull
     private Box box;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     @NotNull
     private User user;
@@ -30,7 +31,5 @@ public class Employee{
 
     @Column(name = "discount_max")
     private Integer discountMax;
-
-
 
 }

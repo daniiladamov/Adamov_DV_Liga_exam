@@ -32,7 +32,7 @@ insert into boxes(ratio) values (1.1), (1.2), (0.8);
 insert into users( first_name, last_name, password, "role", surname, username) values
 ('Адамов', 'Даниил','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ADMIN','Васильевич','admin'),
 ('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','EMPLOYEE',null,'empl'),
-('Заказывающий', 'Заказчик','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ADMIN',null,'user');
+('Заказывающий', 'Заказчик','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','USER',null,'user');
 
 insert into employees(box_id, user_id)values (1, 2);
 
