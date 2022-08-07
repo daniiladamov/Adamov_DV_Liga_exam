@@ -18,3 +18,5 @@ spring:
 exception_message: Сущность не найдена, проверьте id=
 invalid_role: У user#%d недопустимая роль - %s
 time_period: 15
+cron-interval: 0 0/1 8-22 * * ?
+check_interval: 10
