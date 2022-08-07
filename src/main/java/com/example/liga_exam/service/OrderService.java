@@ -6,9 +6,11 @@ import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 public interface OrderService {
@@ -31,4 +33,6 @@ public interface OrderService {
     BigDecimal getRevenue(LocalDate fromDate, LocalDate toDate);
 
     BigDecimal doneOrder(Long id, Integer discount, User user);
+
+    Page<Order> getOrders(Specification<Order> specification, Pageable pageable);
 }

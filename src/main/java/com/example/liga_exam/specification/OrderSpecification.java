@@ -4,14 +4,14 @@ import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.Order_;
+import com.example.liga_exam.entity.User;
 import com.example.liga_exam.service.BoxService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,14 @@ public class OrderSpecification implements Specification<Order> {
                     predicate=criteriaBuilder.and(predicate,
                             criteriaBuilder.lessThanOrEqualTo(root.get(Order_.date),toDate));
             return predicate;
+        };
+    }
+
+    public static Specification<Order> userActiveOrders(User user){
+        return (root, query, criteriaBuilder) -> {
+            Predicate equalUser = criteriaBuilder.equal(root.get(Order_.user), user);
+            Predicate isActive=criteriaBuilder.equal(root.get(Order_.active),true);
+            return criteriaBuilder.and(equalUser,isActive);
         };
     }
 }

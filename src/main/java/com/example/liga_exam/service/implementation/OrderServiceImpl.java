@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
                 .setCost(order, operations);
         order.setUser(user);
         order.setActive(true);
+        order.setOperations(operations);
         return orderRepo.save(order).getId();
     }
 
@@ -57,6 +58,10 @@ public class OrderServiceImpl implements OrderService {
     public Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService) {
         OrderSpecification orderSpecification = new OrderSpecification(orderSearch, boxService);
         return orderRepo.findAll(Specification.where(orderSpecification), pageable);
+    }
+    @Override
+    public Page<Order> getOrders(Specification<Order> specification, Pageable pageable) {
+        return orderRepo.findAll(Specification.where(specification),pageable);
     }
 
     @Override
