@@ -22,11 +22,11 @@ public interface BoxRepo extends JpaRepository<Box, Long>, JpaSpecificationExecu
                               or
                               (o.start_time < make_time(:h, :m,0) +make_interval(mins=>cast((b.ratio *:duration)+1  
                               as int))
-                              and make_time(:h, :m,0) +make_interval(mins=>cast((b.ratio *:duration)+1 as int)) <=
+                              and make_time(:h, :m,0) +make_interval(mins=>cast(ceil(b.ratio *:duration) as int)) <=
                               o.end_time))
                               and
                               ( (make_time(:h, :m,0) between b."open" and b."close") and
-                             	make_time(:h, :m,0) +make_interval(mins=>cast((b.ratio *:duration)+1 as int)) 
+                             	make_time(:h, :m,0) +make_interval(mins=>cast(ceil(b.ratio *:duration) as int)) 
                              	between b."open" and b."close")
                               )
                     """ , nativeQuery = true)

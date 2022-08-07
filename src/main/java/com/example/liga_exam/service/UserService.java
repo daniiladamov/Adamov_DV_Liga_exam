@@ -4,4 +4,6 @@ import com.example.liga_exam.entity.User;
 
 public interface UserService {
     User getUser(Long id);
+
+    User getUserByUsername(String username);
 }

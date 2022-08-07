@@ -12,9 +12,9 @@ public class DiscountDto {
 
     @Min(value = 0)
     @Max(value = 4)
-    private int min;
+    private Integer min;
 
     @Min(value = 5)
     @Max(value = 20)
-    private int max;
+    private Integer max;
 }

@@ -33,6 +33,9 @@ public class User {
     @NotNull
     private String password;
 
+    @OneToOne(mappedBy = "user")
+    private Employee employee;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
