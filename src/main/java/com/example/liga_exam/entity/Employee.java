@@ -25,5 +25,12 @@ public class Employee{
     @NotNull
     private User user;
 
+    @Column(name = "discount_min")
+    private Integer discountMin;
+
+    @Column(name = "discount_max")
+    private Integer discountMax;
+
+
 
 }
