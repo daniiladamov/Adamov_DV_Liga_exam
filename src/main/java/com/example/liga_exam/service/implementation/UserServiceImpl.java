@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
+    private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
@@ -57,6 +59,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String registerUser(User user) {
+        user.setPassword(passwordEncoder.encode(
+                user.getPassword()
+        ));
         User saveUser = userRepo.save(user);
         CompletableFuture.runAsync(() -> {
             try {
