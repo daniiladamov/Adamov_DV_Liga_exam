@@ -8,6 +8,7 @@ import com.example.liga_exam.repository.OrderRepo;
 import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.service.OrderService;
 import com.example.liga_exam.specification.OrderSpecification;
+import com.example.liga_exam.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -141,6 +142,8 @@ public class OrderServiceImpl implements OrderService {
             throw new DateTimeException(INVALID_ORDER_DATE);
         else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L)) < 0)
             throw new DateTimeException(String.format(INVALID_ORDER_TIME,timeInterval));
+        LocalTime roundTime= Utils.roundTime(order.getStartTime());
+        order.setStartTime(roundTime);
         return this;
     }
 
