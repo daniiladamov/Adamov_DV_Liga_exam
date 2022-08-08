@@ -75,6 +75,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    public void arrived(Long id) {
+        Order order=getOrder(id);
+        checkOrderStatus(order);
+        order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
+        orderRepo.save(order);
+    }
+
+    @Override
+    @Transactional
     public void cancel(Long id) {
         Order order = getOrder(id);
         checkOrderStatus(order);
@@ -181,6 +190,8 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderWasDoneException(DONE_ORDER);
         if (order.getOrderStatus().equals(OrderStatus.CANCELED))
             throw new OrderWasCanceledException(CANCELED_ORDER);
+        if (order.getOrderStatus().equals(OrderStatus.ACTIVE_ARRIVED))
+            throw new RepeatedArrivedException(REPEATED_ARRIVED);
         return this;
     }
 }

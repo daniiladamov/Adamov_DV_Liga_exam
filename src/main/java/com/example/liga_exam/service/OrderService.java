@@ -23,6 +23,7 @@ public interface OrderService {
     String INVALID_ORDER_DATE="Запись на прошедшие даты не доступна";
     String INVALID_ORDER_TIME="Запись допступна минимум на %d минут более текущего времени";
     String NOT_FOUND_FREE_BOXES="Нет свободных мест на выбранные дату и время";
+    String REPEATED_ARRIVED="Отметка о присутсвии уже выставлена ранее";
     Long createOrder(Order order, Set<Operation> operations, User user);
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService);
 
@@ -37,4 +38,6 @@ public interface OrderService {
     Page<Order> getOrders(Specification<Order> specification, Pageable pageable);
 
     void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user);
+
+    void arrived(Long id);
 }

@@ -31,6 +31,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(255) default 'ACTIVE'")
+    @NotNull
     private OrderStatus orderStatus;
 
     @NotNull

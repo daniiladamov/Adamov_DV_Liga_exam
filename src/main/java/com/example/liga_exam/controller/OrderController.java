@@ -44,6 +44,11 @@ public class OrderController {
         return orderService.getRevenue(dto.getFromDate(), dto.getToDate());
     }
 
+    @PatchMapping("/{id}/customer-arrived")
+    public void customerArrivedInTime(@PathVariable Long id){
+        orderService.arrived(id);
+    }
+
     @PatchMapping("/{id}/canceled-order")
     public void canceledOrder(@PathVariable Long id) {
         orderService.cancel(id);
@@ -64,5 +69,4 @@ public class OrderController {
         User user=userService.getUserByUsername(username);
         return orderService.doneOrder(id,discount, user);
     }
-
 }
