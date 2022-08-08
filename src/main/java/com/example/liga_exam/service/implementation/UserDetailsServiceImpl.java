@@ -1,6 +1,6 @@
 package com.example.liga_exam.service.implementation;
 
-import com.example.liga_exam.dto.UserAppDto;
+import com.example.liga_exam.security.UserAppDto;
 import com.example.liga_exam.entity.User;
 import com.example.liga_exam.mapper.UserMapper;
 import com.example.liga_exam.repository.UserRepo;

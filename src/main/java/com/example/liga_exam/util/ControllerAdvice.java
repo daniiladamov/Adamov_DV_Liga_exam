@@ -1,5 +1,7 @@
 package com.example.liga_exam.util;
 
+import com.auth0.jwt.exceptions.IncorrectClaimException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.liga_exam.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -15,9 +17,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.management.relation.InvalidRoleValueException;
 import javax.naming.AuthenticationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.time.DateTimeException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @org.springframework.web.bind.annotation.ControllerAdvice
 @RestController
@@ -52,5 +58,18 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     public String expectedExceptions(DateTimeException exception){
         log.error(exception.getMessage());
         return exception.getMessage();
+    }
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String validateFallResponse(ConstraintViolationException ex) {
+        Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        return constraintViolations.stream().map(e -> e.getPropertyPath().toString() + ":"
+                + e.getMessage()).collect(Collectors.joining("\n"));
+
+    }
+    @ExceptionHandler({JWTVerificationException.class, IncorrectClaimException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String verificationJwtFalls(){
+        return "JWT-токен не прошел верификацию на сервере приложения";
     }
 }

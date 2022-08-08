@@ -1,5 +1,6 @@
 package com.example.liga_exam.entity;
 
+import com.example.liga_exam.security.RoleEnum;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -32,6 +32,8 @@ public class User {
 
     @NotNull
     private String password;
+
+    private String uuid;
 
     @OneToOne(mappedBy = "user")
     private Employee employee;

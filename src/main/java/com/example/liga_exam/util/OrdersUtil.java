@@ -4,6 +4,7 @@ import com.example.liga_exam.entity.*;
 import com.example.liga_exam.exception.*;
 import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.repository.OrderRepo;
+import com.example.liga_exam.security.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

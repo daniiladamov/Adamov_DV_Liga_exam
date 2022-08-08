@@ -1,6 +1,6 @@
 package com.example.liga_exam.service.implementation;
 
-import com.example.liga_exam.entity.RoleEnum;
+import com.example.liga_exam.security.RoleEnum;
 import com.example.liga_exam.entity.User;
 import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.exception.UserConfirmException;

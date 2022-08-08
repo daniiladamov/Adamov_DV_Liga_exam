@@ -1,6 +1,6 @@
 package com.example.liga_exam.mapper;
 
-import com.example.liga_exam.dto.UserAppDto;
+import com.example.liga_exam.security.UserAppDto;
 import com.example.liga_exam.dto.request.UserRegisterDto;
 import com.example.liga_exam.dto.response.UserResDto;
 import com.example.liga_exam.entity.User;

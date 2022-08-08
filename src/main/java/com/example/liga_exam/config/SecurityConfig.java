@@ -1,5 +1,6 @@
 package com.example.liga_exam.config;
 
+import com.example.liga_exam.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService detailsService;
+    private final JwtFilter jwtFilter;
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
