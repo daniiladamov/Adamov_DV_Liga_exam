@@ -30,9 +30,10 @@ alter table if exists orders add constraint FK32ql8ubntj5uh44ph9659tiih foreign 
 insert into boxes(ratio) values (1.1), (1.2), (0.8);
 
 insert into users( first_name, last_name, password, "role", surname, username) values
-('Адамов', 'Даниил','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ADMIN','Васильевич','admin'),
-('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','EMPLOYEE',null,'empl'),
-('Заказывающий', 'Заказчик','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','USER',null,'user');
+('Адамов', 'Даниил','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_ADMIN','Васильевич','admin'),
+('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_EMPLOYEE',null,'empl'),
+('Заказывающий', 'Заказчик','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_USER',null,'user'),
+('Заказывалов', 'Заказ','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_USER',null,'user1');
 
 insert into employees(box_id, user_id)values (1, 2);
 
@@ -40,6 +41,6 @@ insert into operations(cost, duration, name) values (300, 15,'мойка баз�
 (200, 10,'мойка двигателя'), (250, 8,'сушка'), (400,16,'полировка');
 
 insert into orders ("date",start_time,end_time,user_id,box_id,cost)
-values (current_date,'15:00:00','15:15:00',1,1,200),(current_date,'15:10:00','15:25:00',1,2,300),
-       (current_date,'15:10:00','15:35:00',1,3,250),(current_date,'13:00:00','13:15:00',1,1,200),
-       (current_date,'13:10:00','13:25:00',1,2,300),(current_date,'13:10:00','13:35:00',1,3,250);
+values (current_date,'15:00:00','15:15:00',3,1,200),(current_date,'15:10:00','15:25:00',4,2,300),
+       (current_date,'15:10:00','15:35:00',3,3,250),(current_date,'13:00:00','13:15:00',4,1,200),
+       (current_date,'13:10:00','13:25:00',4,2,300),(current_date,'13:10:00','13:35:00',3,3,250);

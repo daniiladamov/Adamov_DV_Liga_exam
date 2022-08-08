@@ -45,10 +45,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public Long createEmployee(User user, Box box) throws InvalidRoleValueException {
-        if (!user.getRole().equals(RoleEnum.USER))
+        if (!user.getRole().equals(RoleEnum.ROLE_USER))
             throw new InvalidRoleValueException(String.format(invalidMessage,user.getId(),
                     user.getRole().toString()));
-        user.setRole(RoleEnum.EMPLOYEE);
+        user.setRole(RoleEnum.ROLE_EMPLOYEE);
         Employee employee=new Employee();
         employee.setUser(user);
         employee.setBox(box);

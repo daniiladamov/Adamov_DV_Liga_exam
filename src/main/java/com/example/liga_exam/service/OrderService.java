@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
@@ -17,17 +18,17 @@ public interface OrderService {
     Long createOrder(Order order, Set<Operation> operations, User user);
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService);
 
-    void cancel(Long id);
+    void cancel(Long id, User user) throws AuthenticationException;
 
     Order getOrder(Long id);
 
     BigDecimal getRevenue(LocalDate fromDate, LocalDate toDate);
 
-    BigDecimal doneOrder(Long id, Integer discount, User user);
+    BigDecimal doneOrder(Long id, Integer discount, User user) throws AuthenticationException;
 
     Page<Order> getOrders(Specification<Order> specification, Pageable pageable);
 
-    void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user);
+    void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user) throws AuthenticationException;
 
-    void arrived(Long id);
+    void arrived(Long id, User user) throws AuthenticationException;
 }

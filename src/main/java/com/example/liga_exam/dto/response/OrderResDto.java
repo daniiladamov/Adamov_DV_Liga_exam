@@ -1,5 +1,6 @@
 package com.example.liga_exam.dto.response;
 
+import com.example.liga_exam.entity.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,9 +20,7 @@ public class OrderResDto {
 
     private LocalDate date;
 
-    private boolean active;
-
-    private boolean done;
+    private OrderStatus orderStatus;
 
     private Set<OperationResDto> operations;
 

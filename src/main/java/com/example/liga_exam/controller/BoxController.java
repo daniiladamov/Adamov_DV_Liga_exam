@@ -9,6 +9,7 @@ import com.example.liga_exam.service.BoxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class BoxController {
     private final BoxMapper boxMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Long createBox(@Validated @RequestBody BoxReqDto boxReqDto){
         Box box=boxMapper.toEntity(boxReqDto);
         return boxService.createBox(box);

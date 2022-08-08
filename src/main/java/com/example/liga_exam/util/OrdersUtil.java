@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DateTimeException;
@@ -113,6 +114,19 @@ public class OrdersUtil {
             throw new OrderWasCanceledException(CANCELED_ORDER);
         if (order.getOrderStatus().equals(OrderStatus.ACTIVE_ARRIVED))
             throw new RepeatedArrivedException(REPEATED_ARRIVED);
+        return this;
+    }
+
+    public OrdersUtil checkAccess(Order order, User user) throws AuthenticationException {
+        if (user.getRole().equals(RoleEnum.ROLE_ADMIN))
+            return this;
+        Employee employee = user.getEmployee();
+        if (Objects.nonNull(employee) && !order.getBox().getEmployees().contains(employee)) {
+            throw new AuthenticationException();
+        }
+        if (Objects.isNull(employee) && order.getUser().getId()!= user.getId()){
+            throw new AuthenticationException();
+        }
         return this;
     }
 }
