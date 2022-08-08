@@ -1,4 +1,4 @@
-package com.example.liga_exam.service;
+package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.dto.UserAppDto;
 import com.example.liga_exam.entity.User;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepo userRepo;
     private final UserMapper userMapper;
 

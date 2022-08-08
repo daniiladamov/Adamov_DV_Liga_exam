@@ -33,13 +33,14 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
+            log.error(errors.toString());
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
             OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
-            InvalidRoleValueException.class, UserConfirmException.class})
+            InvalidRoleValueException.class, UserConfirmException.class, IntersectionOrderTimeException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());

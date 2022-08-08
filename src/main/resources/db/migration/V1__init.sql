@@ -33,9 +33,11 @@ insert into users( first_name, last_name, password, "role", surname, username) v
 ('Адамов', 'Даниил','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_ADMIN','Васильевич','admin'),
 ('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_EMPLOYEE',null,'empl'),
 ('Заказывающий', 'Заказчик','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_USER',null,'user'),
-('Заказывалов', 'Заказ','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_USER',null,'user1');
+('Заказывалов', 'Заказ','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_USER',null,'user1'),
+('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_EMPLOYEE',null,'empl1'),
+('Работающий', 'Работяга','$2a$08$J55DI/.0P1CZZDuQa7dqXO1Zsbpl7CEApX2sFG9PUi.yV7MHE0K4e','ROLE_EMPLOYEE',null,'empl2');
 
-insert into employees(box_id, user_id)values (1, 2);
+insert into employees(box_id, user_id)values (1, 2), (2,5), (3,6);
 
 insert into operations(cost, duration, name) values (300, 15,'мойка базовая'), (1200, 25,'химчистка салона'),
 (200, 10,'мойка двигателя'), (250, 8,'сушка'), (400,16,'полировка');

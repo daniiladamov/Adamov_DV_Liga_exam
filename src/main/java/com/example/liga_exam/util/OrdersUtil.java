@@ -3,6 +3,7 @@ package com.example.liga_exam.util;
 import com.example.liga_exam.entity.*;
 import com.example.liga_exam.exception.*;
 import com.example.liga_exam.repository.BoxRepo;
+import com.example.liga_exam.repository.OrderRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DateTimeException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -19,50 +21,69 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.example.liga_exam.util.ExceptionMessage.*;
+
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class OrdersUtil {
     private final BoxRepo boxRepo;
+    private final OrderRepo orderRepo;
     @Value("${time_period}")
     private Long timeInterval;
+    @Value("${only_weekday}")
+    private boolean onlyWeekday;
 
-    public static String REMARK_FOR_BOX = "В Box#%d услуги выполняются с отклонением от графика";
-    public static String EXCEPTION_TIME = "Нельзя завершать услугу до времени ее начала - %s";
-    public static String CANCELED_ORDER = "Заказ был отменен ранее, операция недоступна";
-    public static String DONE_ORDER = "Заказ был выполнен ранее, операция недоступна";
-    public static String INVALID_INTERVAL = "Временной интервал задан неверно";
-    public static String INVALID_DISCOUNT = "Можно назначать скидку в пределах %d% - %d%";
-    public static String DISCOUNT_NOT_AVAILABLE = "Работнику запрещено назначать скидку";
-    public static String INVALID_ORDER_DATE = "Запись на прошедшие даты не доступна";
-    public static String INVALID_ORDER_TIME = "Запись допступна минимум на %d минут более текущего времени";
-    public static String NOT_FOUND_FREE_BOXES = "Нет свободных мест на выбранные дату и время";
-    public static String REPEATED_ARRIVED = "Отметка о присутсвии уже выставлена ранее";
-
-    public OrdersUtil setFreeBox(Order order, Set<Operation> operations) {
+    public OrdersUtil setFreeBox(Order order, Set<Operation> operations, User user) {
         int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
         LocalTime startTime = order.getStartTime();
-        List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(),
+        List<Box> openBoxes=boxRepo.getOpenBoxesWithEmployee(startTime.getHour(),
+                startTime.getMinute(), duration);
+        if (openBoxes.isEmpty())
+            throw new FreeBoxesNotFound(String.format(NOT_WORKED_BOXES.getMessage(),startTime));
+        checkIntersection(order.getDate(),startTime,duration,user.getId());
+        List<Box> busyBoxes = boxRepo.getBusyBoxes(order.getDate(),
                 startTime.getHour(), startTime.getMinute(), duration);
-        if (freeBoxes.isEmpty())
-            throw new FreeBoxesNotFound(NOT_FOUND_FREE_BOXES);
-        Collections.shuffle(freeBoxes);
-        order.setBox(freeBoxes.get(0));
-        double calculate = duration * freeBoxes.get(0).getRatio();
-        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
-        order.setEndTime(endTime);
+        if (openBoxes.isEmpty())
+            throw new FreeBoxesNotFound(NOT_FOUND_FREE_BOXES.getMessage());
+        if (!busyBoxes.isEmpty())
+            openBoxes.removeAll(busyBoxes);
+        checkAvailableBoxes(openBoxes, order,duration);
         return this;
     }
 
+    private void checkAvailableBoxes(List<Box> openBoxes, Order order, int duration){
+        if (openBoxes.isEmpty())
+            throw new FreeBoxesNotFound(NOT_FOUND_FREE_BOXES.getMessage());
+        Collections.shuffle(openBoxes);
+        order.setBox(openBoxes.get(0));
+        double calculate = duration * openBoxes.get(0).getRatio();
+        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
+        order.setEndTime(endTime);
+    }
+    private void checkIntersection(LocalDate date, LocalTime startTime, int duration, Long id){
+        List<Order> getUserOrder=orderRepo.getOrderBetweenTime(date, startTime.getHour(),
+                startTime.getMinute(), duration, id);
+        if (getUserOrder.size()==1)
+            throw new IntersectionOrderTimeException(String.format(INTERSECTION_ORDER_TIME.getMessage(),
+                    id,getUserOrder.get(0).getId()));
+    }
+
     public OrdersUtil checkOrderDataTime(Order order) {
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        if (currentDate.compareTo(order.getDate()) > 0)
-            throw new DateTimeException(INVALID_ORDER_DATE);
-        else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L)) < 0)
-            throw new DateTimeException(String.format(INVALID_ORDER_TIME, timeInterval));
-        LocalTime roundTime = Utils.roundTime(order.getStartTime());
-        order.setStartTime(roundTime);
+        order.setStartTime(Utils.roundTime(order.getStartTime()));
+        LocalDate orderDate=order.getDate();
+        LocalTime orderTime=order.getStartTime();
+        if (LocalDate.now().isAfter(orderDate))
+            throw new DateTimeException(INVALID_ORDER_DATE.getMessage());
+        else if (LocalDate.now().isEqual(orderDate) &&
+                LocalTime.now().isAfter(orderTime.minusMinutes(15L)))
+            throw new DateTimeException(String.format(INVALID_ORDER_TIME.getMessage(), timeInterval));
+        if (onlyWeekday){
+            if (orderDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) ||
+                    orderDate.getDayOfWeek().equals(DayOfWeek.SUNDAY))
+                throw new FreeBoxesNotFound(NOT_WORK_IN_WEEKENDS.getMessage());
+        }
         return this;
     }
 
@@ -80,9 +101,9 @@ public class OrdersUtil {
         if (current.compareTo(end) < 0 && current.compareTo(start) > 0) {
             order.setEndTime(LocalTime.now());
         } else if (current.compareTo(end) >= 0)
-            log.info(String.format(REMARK_FOR_BOX, order.getBox().getId()));
+            log.info(String.format(REMARK_FOR_BOX.getMessage(), order.getBox().getId()));
         else
-            throw new DateTimeException(String.format(EXCEPTION_TIME, start.toString()));
+            throw new DateTimeException(String.format(EXCEPTION_TIME.getMessage(), start.toString()));
         return this;
     }
 
@@ -90,13 +111,13 @@ public class OrdersUtil {
         if (Objects.nonNull(discount)) {
             Employee employee = user.getEmployee();
             if (Objects.nonNull(employee) && Objects.isNull(employee.getDiscountMin())) {
-                throw new DiscountException(DISCOUNT_NOT_AVAILABLE);
+                throw new DiscountException(DISCOUNT_NOT_AVAILABLE.getMessage());
             }
             if (
                     Objects.nonNull(employee) &&
                             (discount < employee.getDiscountMin() || discount > employee.getDiscountMax())
             ) {
-                throw new DiscountException(String.format(INVALID_DISCOUNT,
+                throw new DiscountException(String.format(INVALID_DISCOUNT.getMessage(),
                         employee.getDiscountMin(), employee.getDiscountMax()));
             }
             BigDecimal percent = new BigDecimal(100 - discount);
@@ -109,11 +130,11 @@ public class OrdersUtil {
 
     public OrdersUtil checkOrderStatus(Order order) {
         if (order.getOrderStatus().equals(OrderStatus.DONE))
-            throw new OrderWasDoneException(DONE_ORDER);
+            throw new OrderWasDoneException(DONE_ORDER.getMessage());
         if (order.getOrderStatus().equals(OrderStatus.CANCELED))
-            throw new OrderWasCanceledException(CANCELED_ORDER);
+            throw new OrderWasCanceledException(CANCELED_ORDER.getMessage());
         if (order.getOrderStatus().equals(OrderStatus.ACTIVE_ARRIVED))
-            throw new RepeatedArrivedException(REPEATED_ARRIVED);
+            throw new RepeatedArrivedException(REPEATED_ARRIVED.getMessage());
         return this;
     }
 

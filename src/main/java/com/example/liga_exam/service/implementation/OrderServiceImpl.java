@@ -1,7 +1,10 @@
 package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.dto.request.OrderSearch;
-import com.example.liga_exam.entity.*;
+import com.example.liga_exam.entity.Operation;
+import com.example.liga_exam.entity.Order;
+import com.example.liga_exam.entity.OrderStatus;
+import com.example.liga_exam.entity.User;
 import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.exception.FreeBoxesNotFound;
 import com.example.liga_exam.repository.OrderRepo;
@@ -25,7 +28,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.example.liga_exam.util.OrdersUtil.INVALID_INTERVAL;
+import static com.example.liga_exam.util.ExceptionMessage.INVALID_INTERVAL;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
     public Long createOrder(Order order, Set<Operation> operations, User user) {
         ordersUtil
                 .checkOrderDataTime(order)
-                .setFreeBox(order, operations)
+                .setFreeBox(order, operations, user)
                 .setCost(order, operations);
         order.setUser(user);
         order.setOrderStatus(OrderStatus.ACTIVE);
@@ -68,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrder(id);
         ordersUtil
                 .checkOrderStatus(order)
-                .checkAccess(order,user);
+                .checkAccess(order, user);
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
         order.setStartTime(updatedOrder.getStartTime());
@@ -81,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
     public void arrived(Long id, User user) throws AuthenticationException {
         Order order = getOrder(id);
         ordersUtil
-                .checkAccess(order,user)
+                .checkAccess(order, user)
                 .checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
         orderRepo.save(order);
@@ -92,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
     public void cancel(Long id, User user) throws AuthenticationException {
         Order order = getOrder(id);
         ordersUtil
-                .checkAccess(order,user)
+                .checkAccess(order, user)
                 .checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
@@ -107,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public BigDecimal getRevenue(LocalDate fromDate, LocalDate toDate) {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate) && fromDate.compareTo(toDate) > 0) {
-            throw new DateTimeException(INVALID_INTERVAL);
+            throw new DateTimeException(INVALID_INTERVAL.getMessage());
         }
         List<Order> revenue = orderRepo.findAll(Specification.where(
                 OrderSpecification.revenuePredicate(fromDate, toDate)));
@@ -121,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         ordersUtil
                 .checkOrderStatus(order)
                 .checkDateOrder(order)
-                .checkAccess(order,user)
+                .checkAccess(order, user)
                 .checkDiscountOrder(order, discount, user);
         order.setOrderStatus(OrderStatus.DONE);
         orderRepo.save(order);
