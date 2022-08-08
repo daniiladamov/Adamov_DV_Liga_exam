@@ -20,7 +20,7 @@ between b."open" and b."close")
 except
 select distinct bx.* from boxes bx join orders o  on bx.id =o.box_id
 where
-o."date" =:date and o.active = true and(
+o."date" =:date and o.order_status in ('ACTIVE', 'ACTIVE_ARRIVED') and(
 (o.start_time <= make_time(:h, :m,0) and  make_time(:h, :m,0)<o.end_time)
 or
 (o.start_time < cast(make_time(:h, :m,0) +cast(ceil(bx.ratio *:duration)  as int)*interval '1 minute' as time)
