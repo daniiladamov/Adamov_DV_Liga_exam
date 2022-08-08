@@ -32,7 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.
                 csrf().disable().
                 authorizeRequests().
-                antMatchers(HttpMethod.POST, "api/auth").anonymous().
+                antMatchers(HttpMethod.GET,"/api/auth/confirm/*").anonymous().
+                antMatchers(HttpMethod.POST, "/api/auth/*").anonymous().
                 anyRequest().authenticated().
                 and().
 //                addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).

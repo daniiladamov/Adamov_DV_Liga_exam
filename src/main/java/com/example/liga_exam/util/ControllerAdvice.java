@@ -39,7 +39,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
             OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
-            InvalidRoleValueException.class})
+            InvalidRoleValueException.class, UserConfirmException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());
@@ -51,11 +51,5 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     public String expectedExceptions(DateTimeException exception){
         log.error(exception.getMessage());
         return exception.getMessage();
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public String authenticationFalls(){
-        return "Не пройдена авторизация пользователя";
     }
 }
