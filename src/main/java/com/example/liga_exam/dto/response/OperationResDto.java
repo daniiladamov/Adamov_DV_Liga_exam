@@ -13,4 +13,6 @@ public class OperationResDto {
     private String name;
 
     private BigDecimal cost;
+
+    private Integer duration;
 }

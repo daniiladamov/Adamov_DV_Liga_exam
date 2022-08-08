@@ -18,4 +18,5 @@ public class BoxReqDto {
 
     @NotNull
     private LocalTime close;
+
 }

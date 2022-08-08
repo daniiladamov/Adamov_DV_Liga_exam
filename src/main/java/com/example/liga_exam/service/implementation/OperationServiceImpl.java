@@ -4,6 +4,8 @@ import com.example.liga_exam.entity.Operation;
 import com.example.liga_exam.repository.OperationRepo;
 import com.example.liga_exam.service.OperationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +26,10 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public Set<Operation> getOperations(Set<Long> ids) {
         return new HashSet<>(operationRepo.findAllById(ids));
+    }
+
+    @Override
+    public Page<Operation> getOperations(Pageable pageable) {
+        return operationRepo.findAll(pageable);
     }
 }
