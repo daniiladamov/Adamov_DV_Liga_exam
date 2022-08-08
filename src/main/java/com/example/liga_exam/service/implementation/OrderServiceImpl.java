@@ -1,16 +1,18 @@
 package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.dto.request.OrderSearch;
-import com.example.liga_exam.entity.*;
-import com.example.liga_exam.exception.*;
-import com.example.liga_exam.repository.BoxRepo;
+import com.example.liga_exam.entity.Operation;
+import com.example.liga_exam.entity.Order;
+import com.example.liga_exam.entity.OrderStatus;
+import com.example.liga_exam.entity.User;
+import com.example.liga_exam.exception.EntityNotFoundException;
+import com.example.liga_exam.exception.FreeBoxesNotFound;
 import com.example.liga_exam.repository.OrderRepo;
 import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.service.OrderService;
 import com.example.liga_exam.specification.OrderSpecification;
-import com.example.liga_exam.util.Utils;
+import com.example.liga_exam.util.OrdersUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,31 +21,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.example.liga_exam.util.OrdersUtil.INVALID_INTERVAL;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@Slf4j
 public class OrderServiceImpl implements OrderService {
     private final OrderRepo orderRepo;
-    private final BoxRepo boxRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
-    @Value("${time_period}")
-    private Long timeInterval;
+    private final OrdersUtil ordersUtil;
 
     @Transactional
     @Override
     public Long createOrder(Order order, Set<Operation> operations, User user) {
-        checkOrderDataTime(order)
+        ordersUtil
+                .checkOrderDataTime(order)
                 .setFreeBox(order, operations)
                 .setCost(order, operations);
         order.setUser(user);
@@ -57,28 +56,29 @@ public class OrderServiceImpl implements OrderService {
         OrderSpecification orderSpecification = new OrderSpecification(orderSearch, boxService);
         return orderRepo.findAll(Specification.where(orderSpecification), pageable);
     }
+
     @Override
     public Page<Order> getOrders(Specification<Order> specification, Pageable pageable) {
-        return orderRepo.findAll(Specification.where(specification),pageable);
+        return orderRepo.findAll(Specification.where(specification), pageable);
     }
 
     @Override
     @Transactional(rollbackFor = FreeBoxesNotFound.class)
     public void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user) {
-        Order order=getOrder(id);
-        checkOrderStatus(order);
+        Order order = getOrder(id);
+        ordersUtil.checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
         order.setStartTime(updatedOrder.getStartTime());
         order.setDate(updatedOrder.getDate());
-        createOrder(order,operations,user);
+        createOrder(order, operations, user);
     }
 
     @Override
     @Transactional
     public void arrived(Long id) {
-        Order order=getOrder(id);
-        checkOrderStatus(order);
+        Order order = getOrder(id);
+        ordersUtil.checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
         orderRepo.save(order);
     }
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void cancel(Long id) {
         Order order = getOrder(id);
-        checkOrderStatus(order);
+        ordersUtil.checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
     }
@@ -112,89 +112,12 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public BigDecimal doneOrder(Long orderId, Integer discount, User user) {
         Order order = getOrder(orderId);
-        checkOrderStatus(order)
+        ordersUtil
+                .checkOrderStatus(order)
                 .checkDateOrder(order)
                 .checkDiscountOrder(order, discount, user);
         order.setOrderStatus(OrderStatus.DONE);
         orderRepo.save(order);
         return order.getCost();
-    }
-
-    private OrderServiceImpl setFreeBox(Order order, Set<Operation> operations) {
-        int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
-        LocalTime startTime = order.getStartTime();
-        List<Box> freeBoxes = boxRepo.getFreeBoxes(order.getDate(),
-                startTime.getHour(), startTime.getMinute(), duration);
-        if (freeBoxes.isEmpty())
-            throw new FreeBoxesNotFound(NOT_FOUND_FREE_BOXES);
-        Collections.shuffle(freeBoxes);
-        order.setBox(freeBoxes.get(0));
-        double calculate = duration * freeBoxes.get(0).getRatio();
-        LocalTime endTime = order.getStartTime().plusMinutes((long) Math.ceil(calculate));
-        order.setEndTime(endTime);
-        return this;
-    }
-
-    private OrderServiceImpl checkOrderDataTime(Order order) {
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        if (currentDate.compareTo(order.getDate()) > 0)
-            throw new DateTimeException(INVALID_ORDER_DATE);
-        else if (currentTime.compareTo(order.getStartTime().minusMinutes(15L)) < 0)
-            throw new DateTimeException(String.format(INVALID_ORDER_TIME,timeInterval));
-        LocalTime roundTime= Utils.roundTime(order.getStartTime());
-        order.setStartTime(roundTime);
-        return this;
-    }
-
-    private OrderServiceImpl setCost(Order order, Set<Operation> operations) {
-        BigDecimal cost = operations.stream().map(op -> op.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
-        cost.setScale(2, RoundingMode.CEILING);
-        order.setCost(cost);
-        return this;
-    }
-
-    private OrderServiceImpl checkDateOrder(Order order) {
-        LocalTime current = LocalTime.now();
-        LocalTime start = order.getStartTime();
-        LocalTime end = order.getEndTime();
-        if (current.compareTo(end) < 0 && current.compareTo(start) > 0) {
-            order.setEndTime(LocalTime.now());
-        } else if (current.compareTo(end) >= 0)
-            log.info(String.format(REMARK_FOR_BOX, order.getBox().getId()));
-        else
-            throw new DateTimeException(String.format(EXCEPTION_TIME, start.toString()));
-        return this;
-    }
-
-    private OrderServiceImpl checkDiscountOrder(Order order, Integer discount, User user) {
-        if (Objects.nonNull(discount)) {
-            Employee employee = user.getEmployee();
-            if (Objects.nonNull(employee) && Objects.isNull(employee.getDiscountMin())) {
-                throw new DiscountException(DISCOUNT_NOT_AVAILABLE);
-            }
-            if (
-                    Objects.nonNull(employee) &&
-                            (discount < employee.getDiscountMin() || discount > employee.getDiscountMax())
-            ) {
-                throw new DiscountException(String.format(INVALID_DISCOUNT,
-                        employee.getDiscountMin(), employee.getDiscountMax()));
-            }
-            BigDecimal percent = new BigDecimal(100 - discount);
-            BigDecimal updateCost = order.getCost().scaleByPowerOfTen(-2).multiply(percent)
-                    .setScale(2, RoundingMode.CEILING);
-            order.setCost(updateCost);
-        }
-        return this;
-    }
-
-    private OrderServiceImpl checkOrderStatus(Order order) {
-        if (order.getOrderStatus().equals(OrderStatus.DONE))
-            throw new OrderWasDoneException(DONE_ORDER);
-        if (order.getOrderStatus().equals(OrderStatus.CANCELED))
-            throw new OrderWasCanceledException(CANCELED_ORDER);
-        if (order.getOrderStatus().equals(OrderStatus.ACTIVE_ARRIVED))
-            throw new RepeatedArrivedException(REPEATED_ARRIVED);
-        return this;
     }
 }

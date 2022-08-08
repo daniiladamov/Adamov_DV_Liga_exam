@@ -32,16 +32,6 @@ public class UserController {
     private final OrderMapper orderMapper;
     private final OperationService operationService;
 
-//@todo: перенести в OrderController!
-    @PostMapping("/{id}/orders")
-    public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto, @PathVariable Long id) {
-        Set<Operation> operationSet = operationService.getOperations(
-                orderReqDto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
-        Order order = orderMapper.toEntity(orderReqDto);
-        User user = userService.getUser(id);
-        return orderService.createOrder(order, operationSet, user);
-    }
-
     @GetMapping("/{id}/orders")
     public Page<OrderResDto> getOrders(@PathVariable Long id, Pageable pageable) {
         User user = userService.getUser(id);

@@ -34,6 +34,15 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     @PostMapping
+    public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto) {
+        Set<Operation> operationSet = operationService.getOperations(
+                orderReqDto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
+        Order order = orderMapper.toEntity(orderReqDto);
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByUsername(username);
+        return orderService.createOrder(order, operationSet, user);
+    }
+    @PostMapping
     public Page<OrderResDto> getBoxFilter(@RequestBody OrderSearch orderSearch, Pageable pageable) {
         return orderService.getOrders(orderSearch, pageable, boxService)
                 .map(x -> orderMapper.toResponse(x));

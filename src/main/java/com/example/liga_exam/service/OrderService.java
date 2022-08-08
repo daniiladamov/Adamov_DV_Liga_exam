@@ -13,17 +13,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public interface OrderService {
-    String REMARK_FOR_BOX = "В Box#%d услуги выполняются с отклонением от графика";
-    String EXCEPTION_TIME = "Нельзя завершать услугу до времени ее начала - %s";
-    String CANCELED_ORDER = "Заказ был отменен ранее, операция недоступна";
-    String DONE_ORDER = "Заказ был выполнен ранее, операция недоступна";
-    String INVALID_INTERVAL = "Временной интервал задан неверно";
-    String INVALID_DISCOUNT="Можно назначать скидку в пределах %d% - %d%";
-    String DISCOUNT_NOT_AVAILABLE="Работнику запрещено назначать скидку";
-    String INVALID_ORDER_DATE="Запись на прошедшие даты не доступна";
-    String INVALID_ORDER_TIME="Запись допступна минимум на %d минут более текущего времени";
-    String NOT_FOUND_FREE_BOXES="Нет свободных мест на выбранные дату и время";
-    String REPEATED_ARRIVED="Отметка о присутсвии уже выставлена ранее";
+
     Long createOrder(Order order, Set<Operation> operations, User user);
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService);
 
