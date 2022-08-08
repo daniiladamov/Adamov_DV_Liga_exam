@@ -23,20 +23,15 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="start_time")
     private LocalTime startTime;
 
-    @Column(name="end_time")
     private LocalTime endTime;
 
-    @Column(name="date")
     private LocalDate date;
 
-    @Column(columnDefinition = "boolean default true")
-    private boolean active;
-
-    @Column(columnDefinition = "boolean default false")
-    private boolean done;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(255) default 'ACTIVE'")
+    private OrderStatus orderStatus;
 
     @NotNull
     @Column(name="cost")
@@ -48,7 +43,7 @@ public class Order {
             joinColumns = @JoinColumn(name="order_id"),
             inverseJoinColumns = @JoinColumn(name ="operation_id")
     )
-    @Fetch(FetchMode.SUBSELECT)
+    @Fetch(value=FetchMode.SUBSELECT)
     private Set<Operation> operations;
 
     @ManyToOne

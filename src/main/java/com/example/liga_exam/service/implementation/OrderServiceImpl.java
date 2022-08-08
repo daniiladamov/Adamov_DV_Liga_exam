@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
                 .setFreeBox(order, operations)
                 .setCost(order, operations);
         order.setUser(user);
-        order.setActive(true);
+        order.setOrderStatus(OrderStatus.ACTIVE);
         order.setOperations(operations);
         return orderRepo.save(order).getId();
     }
@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user) {
         Order order=getOrder(id);
         checkOrderStatus(order);
-        order.setActive(false);
+        order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
         order.setStartTime(updatedOrder.getStartTime());
         order.setDate(updatedOrder.getDate());
@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     public void cancel(Long id) {
         Order order = getOrder(id);
         checkOrderStatus(order);
-        order.setActive(false);
+        order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
     }
 
@@ -105,8 +105,7 @@ public class OrderServiceImpl implements OrderService {
         checkOrderStatus(order)
                 .checkDateOrder(order)
                 .checkDiscountOrder(order, discount, user);
-        order.setDone(true);
-        order.setActive(false);
+        order.setOrderStatus(OrderStatus.DONE);
         orderRepo.save(order);
         return order.getCost();
     }
@@ -178,9 +177,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderServiceImpl checkOrderStatus(Order order) {
-        if (order.isDone())
+        if (order.getOrderStatus().equals(OrderStatus.DONE))
             throw new OrderWasDoneException(DONE_ORDER);
-        if (!order.isActive())
+        if (order.getOrderStatus().equals(OrderStatus.CANCELED))
             throw new OrderWasCanceledException(CANCELED_ORDER);
         return this;
     }

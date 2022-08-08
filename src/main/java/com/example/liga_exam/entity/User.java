@@ -41,6 +41,6 @@ public class User {
     private RoleEnum role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SUBSELECT)
+    @Fetch(value=FetchMode.SUBSELECT)
     private Set<Order> orders;
 }
