@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.management.relation.InvalidRoleValueException;
 import javax.naming.AuthenticationException;
 import java.time.DateTimeException;
 import java.util.HashMap;
@@ -37,9 +38,10 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
-            OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class})
+            OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
+            InvalidRoleValueException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String expectedExceptions(RuntimeException exception){
+    public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());
         return exception.getMessage();
     }

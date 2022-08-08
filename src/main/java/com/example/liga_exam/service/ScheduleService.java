@@ -24,7 +24,7 @@ public class ScheduleService {
     @Value("${check_interval}")
     private Long checkInterval;
 
-    @Scheduled(cron = "${cron-interval}")
+    @Scheduled(cron = "${cron_interval}")
     @Async
     @Transactional
     public void refreshOrders() {

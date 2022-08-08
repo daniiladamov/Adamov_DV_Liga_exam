@@ -1,5 +1,6 @@
 package com.example.liga_exam.service.implementation;
 
+import com.example.liga_exam.entity.RoleEnum;
 import com.example.liga_exam.entity.User;
 import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.repository.UserRepo;
@@ -10,6 +11,8 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,5 +34,13 @@ public class UserServiceImpl implements UserService {
     public User getUserByUsername(String username) {
         return userRepo.findByUsername(username).orElseThrow(()->
                 new UsernameNotFoundException(String.format(INVALID_USERNAME,username)));
+    }
+
+    @Override
+    @Transactional
+    public Long saveUser(User user) {
+        if (Objects.isNull(user.getRole()))
+            user.setRole(RoleEnum.ROLE_USER);
+        return userRepo.save(user).getId();
     }
 }
