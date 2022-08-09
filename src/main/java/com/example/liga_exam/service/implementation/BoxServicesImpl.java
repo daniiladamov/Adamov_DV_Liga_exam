@@ -7,6 +7,7 @@ import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.specification.OrderSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -22,8 +23,10 @@ import java.time.LocalTime;
 @Transactional(readOnly = true)
 public class BoxServicesImpl implements BoxService {
     @Value("${company_open}")
+    @Setter
     private Integer companyOpen;
     @Value("${company_close}")
+    @Setter
     private Integer companyClose;
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
