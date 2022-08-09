@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalTime;
 import java.util.Optional;
@@ -32,8 +33,8 @@ class BoxServicesImplTest {
         boxCreated.setId(boxIdCreated);
         boxCreated.setOpen(LocalTime.MIN);
         boxCreated.setClose(LocalTime.MAX);
-        boxServices.setCompanyClose(22);
-        boxServices.setCompanyOpen(8);
+//        boxServices.setCompanyClose(22);
+//        boxServices.setCompanyOpen(8);
         boxUpdated.setId(boxIdUpdated);
         boxUpdated.setOpen(LocalTime.MIN);
         boxUpdated.setClose(LocalTime.MAX);

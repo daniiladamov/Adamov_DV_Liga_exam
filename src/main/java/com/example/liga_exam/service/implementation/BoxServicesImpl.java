@@ -23,14 +23,12 @@ import java.time.LocalTime;
 @Transactional(readOnly = true)
 public class BoxServicesImpl implements BoxService {
     @Value("${company_open}")
-    @Setter
-    private Integer companyOpen;
+    private static Integer companyOpen;
     @Value("${company_close}")
-    @Setter
-    private Integer companyClose;
+    private static Integer companyClose;
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
-    private String exceptionMessage;
+    private static String exceptionMessage;
 
     @Override
     @Transactional
