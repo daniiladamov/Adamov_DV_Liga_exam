@@ -29,6 +29,9 @@ public class Order {
 
     private LocalDate date;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean confirm=false;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(255) default 'ACTIVE'")
     @NotNull

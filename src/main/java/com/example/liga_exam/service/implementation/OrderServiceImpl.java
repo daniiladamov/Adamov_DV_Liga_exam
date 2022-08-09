@@ -4,8 +4,8 @@ import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.*;
 import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.exception.FreeBoxesNotFound;
+import com.example.liga_exam.exception.OrderConfirmException;
 import com.example.liga_exam.repository.OrderRepo;
-import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.service.OrderService;
 import com.example.liga_exam.specification.OrderSpecification;
 import com.example.liga_exam.util.OrdersUtil;
@@ -25,6 +25,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.example.liga_exam.util.ExceptionMessage.INVALID_INTERVAL;
 
@@ -34,35 +36,23 @@ import static com.example.liga_exam.util.ExceptionMessage.INVALID_INTERVAL;
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
     private final OrderRepo orderRepo;
+    private final OrdersUtil ordersUtil;
     @Value("${exception_message}")
     private String exceptionMessage;
-    private final OrdersUtil ordersUtil;
-
-    @Transactional
-    @Override
-    public Long createOrder(Order order, Set<Operation> operations, User user)
-            throws AuthenticationException {
-        ordersUtil
-                .checkAccess(order,user)
-                .checkOrderDataTime(order)
-                .setFreeBox(order, operations, user)
-                .setCost(order, operations);
-        order.setUser(user);
-        order.setOrderStatus(OrderStatus.ACTIVE);
-        order.setOperations(operations);
-        return orderRepo.save(order).getId();
-    }
+    @Value("${time_period}")
+    private Long timeForConfirm;
+    private final static String REPEAT_CONFIRM = "Пользователь уже подтведил бронь заказа";
 
     @Override
     public Page<Order> getOrders(OrderSearch orderSearch, Integer pageNumber,
                                  Integer pageSize, Box box, User user) {
         if (Objects.isNull(pageNumber))
-            pageNumber=0;
+            pageNumber = 0;
         if (Objects.isNull(pageSize))
-            pageSize=5;
+            pageSize = 5;
         OrderSpecification orderSpecification = new OrderSpecification(orderSearch, box, user);
         return orderRepo.findAll(Specification.where(orderSpecification),
-                PageRequest.of(pageNumber,pageSize));
+                PageRequest.of(pageNumber, pageSize));
     }
 
     @Override
@@ -94,6 +84,49 @@ public class OrderServiceImpl implements OrderService {
                 .checkAccess(order, user)
                 .checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
+        orderRepo.save(order);
+    }
+
+    @Transactional
+    @Override
+    public String createOrder(Order order, Set<Operation> operations, User user) {
+        ordersUtil
+                .checkOrderDataTime(order)
+                .setFreeBox(order, operations, user)
+                .setCost(order, operations);
+        order.setUser(user);
+        order.setOrderStatus(OrderStatus.ACTIVE);
+        order.setOperations(operations);
+        Order saveOrder = orderRepo.save(order);
+        CompletableFuture.runAsync(() -> {
+            try {
+                TimeUnit.MINUTES.sleep(timeForConfirm);
+                cancelNotConfirmOrder(saveOrder.getId());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return String.format("http://localhost:8080/api/orders/%d/confirm", saveOrder.getId());
+    }
+
+    @Override
+    @Transactional
+    public Long confirmOrder(Long id) {
+        Order order = getOrder(id);
+        if (order.getConfirm())
+            throw new OrderConfirmException(REPEAT_CONFIRM);
+        else {
+            order.setOrderStatus(OrderStatus.ACTIVE);
+            order.setConfirm(true);
+            return orderRepo.save(order).getId();
+        }
+    }
+
+    @Override
+    public void cancelNotConfirmOrder(Long id) {
+        Order order = getOrder(id);
+        if (!order.getConfirm())
+            order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
     }
 

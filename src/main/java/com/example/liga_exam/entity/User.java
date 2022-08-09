@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.Set;
 
@@ -45,4 +46,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Fetch(value=FetchMode.SUBSELECT)
     private Set<Order> orders;
+
+    @PostConstruct
+    private void setDefaultRole(){
+        this.setRole(RoleEnum.ROLE_USER);
+    }
 }

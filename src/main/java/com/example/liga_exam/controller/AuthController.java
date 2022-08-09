@@ -22,13 +22,12 @@ public class AuthController {
     private final AuthService authService;
     private final UserMapper userMapper;
     private final UserService userService;
-    private final static String CONFIRM_REGISTRATION = "Запись подтверждена, ваш id=";
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public String registration(@Validated @RequestBody UserRegisterDto dto) {
+    public Long registration(@Validated @RequestBody UserRegisterDto dto) {
         User user = userMapper.toEntity(dto);
-        return userService.registerUser(user);
+        return userService.createUser(user);
     }
 
     @PostMapping("/login")
@@ -37,12 +36,6 @@ public class AuthController {
         return jwtService.generateTokens(dto.getUsername());
     }
 
-    @GetMapping("/confirm/{id}")
-    public String confirmRegistration(@PathVariable Long id) {
-
-        userService.confirmUser(id);
-        return CONFIRM_REGISTRATION + id;
-    }
     @PostMapping("jwt-refresh")
     public JwtResDto refreshAllTokens(@RequestBody JwtRefreshDto dto){
         String username= jwtService.validateJwtRefreshToken(dto.getRefreshToken());

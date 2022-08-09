@@ -45,8 +45,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
             OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
-            InvalidRoleValueException.class, UserConfirmException.class, IntersectionOrderTimeException.class,
-            NullPointerException.class})
+            InvalidRoleValueException.class, OrderConfirmException.class, IntersectionOrderTimeException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());

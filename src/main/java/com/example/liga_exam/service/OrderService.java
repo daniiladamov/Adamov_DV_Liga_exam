@@ -16,7 +16,8 @@ import java.util.Set;
 
 public interface OrderService {
 
-    Long createOrder(Order order, Set<Operation> operations, User user) throws AuthenticationException;
+    String createOrder(Order order, Set<Operation> operations, User user)
+            throws AuthenticationException;
 
     Page<Order> getOrders(OrderSearch orderSearch, Integer pageNumber, Integer pageSize,
                           Box box, User user);
@@ -36,4 +37,7 @@ public interface OrderService {
             throws AuthenticationException;
 
     void arrived(Long id, User user) throws AuthenticationException;
+
+    Long confirmOrder(Long id);
+    void cancelNotConfirmOrder(Long id);
 }

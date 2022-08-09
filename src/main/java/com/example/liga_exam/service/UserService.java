@@ -7,8 +7,5 @@ public interface UserService {
 
     User getUserByUsername(String username);
 
-    String registerUser(User user);
-
-    Long confirmUser(Long id);
-    void deleteNotConfirmUser(Long id);
+    Long createUser(User user);
 }

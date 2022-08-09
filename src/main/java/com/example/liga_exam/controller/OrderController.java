@@ -32,16 +32,22 @@ public class OrderController {
     private final BoxService boxService;
     private final OrderMapper orderMapper;
     private final AuthService authService;
+    private final static String CONFIRM_REGISTRATION = "Запись подтверждена, номер заказа id=";
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','USER')")
-    public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public String createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
             throws AuthenticationException {
         Set<Operation> operationSet = operationService.getOperations(
                 orderReqDto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
         Order order = orderMapper.toEntity(orderReqDto);
         User user = userService.getUserByUsername(authService.getUsername());
         return orderService.createOrder(order, operationSet, user);
+    }
+    @GetMapping("/{id}/confirm")
+    public String confirmRegistration(@PathVariable Long id) {
+        orderService.confirmOrder(id);
+        return CONFIRM_REGISTRATION + id;
     }
 
     @PostMapping("/filter")
