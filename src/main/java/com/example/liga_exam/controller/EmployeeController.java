@@ -4,6 +4,7 @@ import com.example.liga_exam.dto.request.DiscountDto;
 import com.example.liga_exam.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +16,7 @@ public class EmployeeController {
 
     @PatchMapping("/{id}/set-discount")
     @PreAuthorize("hasRole('ADMIN')")
-    public void setDiscount(@RequestBody DiscountDto dto, @PathVariable Long id){
+    public void setDiscount(@Validated @RequestBody DiscountDto dto, @PathVariable Long id){
         employeeService.setDiscount(id, dto.getMin(), dto.getMax());
     }
 }

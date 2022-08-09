@@ -14,12 +14,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+import static com.example.liga_exam.entity.Order_.box;
+
 public interface OrderService {
 
     String createOrder(Order order, Set<Operation> operations, User user)
             throws AuthenticationException;
 
-    Page<Order> getOrders(OrderSearch orderSearch, Integer pageNumber, Integer pageSize,
+    Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable,
                           Box box, User user);
 
     void cancel(Long id, User user) throws AuthenticationException;

@@ -9,6 +9,7 @@ import com.example.liga_exam.repository.OrderRepo;
 import com.example.liga_exam.service.OrderService;
 import com.example.liga_exam.specification.OrderSpecification;
 import com.example.liga_exam.util.OrdersUtil;
+import com.example.liga_exam.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -44,15 +45,9 @@ public class OrderServiceImpl implements OrderService {
     private final static String REPEAT_CONFIRM = "Пользователь уже подтведил бронь заказа";
 
     @Override
-    public Page<Order> getOrders(OrderSearch orderSearch, Integer pageNumber,
-                                 Integer pageSize, Box box, User user) {
-        if (Objects.isNull(pageNumber))
-            pageNumber = 0;
-        if (Objects.isNull(pageSize))
-            pageSize = 5;
+    public Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, Box box, User user) {
         OrderSpecification orderSpecification = new OrderSpecification(orderSearch, box, user);
-        return orderRepo.findAll(Specification.where(orderSpecification),
-                PageRequest.of(pageNumber, pageSize));
+        return orderRepo.findAll(Specification.where(orderSpecification), pageable);
     }
 
     @Override
@@ -159,7 +154,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public BigDecimal doneOrder(Long orderId, Integer discount, User user) throws AuthenticationException {
+    public BigDecimal doneOrder(Long orderId, Integer discount, User user)
+            throws AuthenticationException {
         Order order = getOrder(orderId);
         ordersUtil
                 .checkOrderStatus(order)

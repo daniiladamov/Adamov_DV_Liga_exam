@@ -5,6 +5,7 @@ import com.example.liga_exam.dto.response.OperationResDto;
 import com.example.liga_exam.entity.Operation;
 import com.example.liga_exam.mapper.OperationMapper;
 import com.example.liga_exam.service.OperationService;
+import com.example.liga_exam.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +27,8 @@ public class OperationController {
         return operationService.createService(operation);
     }
     @GetMapping
-    public Page<OperationResDto> getOperations(Pageable pageable){
-        return operationService.getOperations(pageable).map(op ->
-                operationMapper.toResponse(op));
+    public Page<OperationResDto> getOperations(Integer pageNumber, Integer pageSize){
+        Pageable pageable= Utils.getPageable(pageNumber, pageSize);
+        return operationService.getOperations(pageable).map(op -> operationMapper.toResponse(op));
     }
 }

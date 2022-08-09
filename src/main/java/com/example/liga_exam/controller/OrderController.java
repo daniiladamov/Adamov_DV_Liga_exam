@@ -10,8 +10,10 @@ import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.entity.User;
 import com.example.liga_exam.mapper.OrderMapper;
 import com.example.liga_exam.service.*;
+import com.example.liga_exam.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +61,8 @@ public class OrderController {
         if (Objects.nonNull(orderSearch.getBoxId()))
             box = boxService.getBox(orderSearch.getBoxId());
         User user = userService.getUserByUsername(authService.getUsername());
-        return orderService.getOrders(orderSearch, pageNumber, pageSize, box, user)
+        Pageable pageable= Utils.getPageable(pageNumber, pageSize);
+        return orderService.getOrders(orderSearch, pageable, box, user)
                 .map(x -> orderMapper.toResponse(x));
     }
 
@@ -70,7 +73,8 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/customer-arrived")
-    public void customerArrivedInTime(@PathVariable Long id) throws AuthenticationException {
+    public void customerArrivedInTime(@PathVariable Long id)
+            throws AuthenticationException {
         User user = userService.getUserByUsername(authService.getUsername());
         orderService.arrived(id, user);
     }
@@ -93,7 +97,8 @@ public class OrderController {
 
     @PatchMapping("/{id}/done-order")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
-    public BigDecimal doneOrder(@PathVariable Long id, Integer discount) throws AuthenticationException {
+    public BigDecimal doneOrder(@PathVariable Long id, Integer discount)
+            throws AuthenticationException {
         User user = userService.getUserByUsername(authService.getUsername());
         return orderService.doneOrder(id, discount, user);
     }

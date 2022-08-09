@@ -11,6 +11,7 @@ import com.example.liga_exam.service.EmployeeService;
 import com.example.liga_exam.service.OrderService;
 import com.example.liga_exam.service.UserService;
 import com.example.liga_exam.specification.OrderSpecification;
+import com.example.liga_exam.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +34,10 @@ public class UserController {
 
     @GetMapping("/{id}/orders")
     @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
-    public Page<OrderResDto> getOrders(@PathVariable Long id, Pageable pageable) {
+    public Page<OrderResDto> getOrders(@PathVariable Long id, Integer pageNumber,
+                                       Integer pageSize) {
         User user = userService.getUser(id);
+        Pageable pageable= Utils.getPageable(pageNumber, pageSize);
         Specification<Order> orderSpecification = OrderSpecification.userActiveOrders(user);
         return orderService.getOrders(orderSpecification, pageable).map(o -> orderMapper.toResponse(o));
     }
