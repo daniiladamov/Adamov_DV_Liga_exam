@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrder(id);
         ordersUtil
                 .checkAccess(order, user)
+                .checkTimeArrived(order)
                 .checkOrderStatus(order);
         order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
         orderRepo.save(order);
@@ -159,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrder(orderId);
         ordersUtil
                 .checkOrderStatus(order)
-                .checkDateOrder(order)
+                .checkDateOrderDone(order)
                 .checkAccess(order, user)
                 .checkDiscountOrder(order, discount, user);
         order.setOrderStatus(OrderStatus.DONE);

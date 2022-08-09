@@ -37,7 +37,7 @@ public class OrderController {
     private final static String CONFIRM_REGISTRATION = "Запись подтверждена, номер заказа id=";
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     public String createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
             throws AuthenticationException {
         Set<Operation> operationSet = operationService.getOperations(

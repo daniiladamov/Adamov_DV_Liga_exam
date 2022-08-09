@@ -36,7 +36,7 @@ public class AuthController {
         return jwtService.generateTokens(dto.getUsername());
     }
 
-    @PostMapping("jwt-refresh")
+    @PostMapping("/jwt-refresh")
     public JwtResDto refreshAllTokens(@RequestBody JwtRefreshDto dto){
         String username= jwtService.validateJwtRefreshToken(dto.getRefreshToken());
         return jwtService.generateTokens(username);

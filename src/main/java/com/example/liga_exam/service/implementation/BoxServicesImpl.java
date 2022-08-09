@@ -23,9 +23,9 @@ import java.time.LocalTime;
 @Transactional(readOnly = true)
 public class BoxServicesImpl implements BoxService {
     @Value("${company_open}")
-    private static Integer companyOpen;
+    private Integer companyOpen;
     @Value("${company_close}")
-    private static Integer companyClose;
+    private Integer companyClose;
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
     private static String exceptionMessage;
@@ -57,5 +57,4 @@ public class BoxServicesImpl implements BoxService {
         box.setClose(updateBox.getClose());
         createBox(box);
     }
-
 }

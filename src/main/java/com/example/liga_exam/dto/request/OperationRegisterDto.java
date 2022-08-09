@@ -20,6 +20,6 @@ public class OperationRegisterDto {
     private Integer duration;
 
     @NotNull
-    @Min(value = 200)
+    @Min(value = 100)
     private BigDecimal cost;
 }

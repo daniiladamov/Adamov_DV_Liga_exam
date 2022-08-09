@@ -1,5 +1,6 @@
 package com.example.liga_exam.service.implementation;
 
+import com.example.liga_exam.entity.Employee;
 import com.example.liga_exam.security.RoleEnum;
 import com.example.liga_exam.entity.User;
 import com.example.liga_exam.exception.EntityNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(
                 user.getPassword()
         ));
+        user.setRole(RoleEnum.ROLE_USER);
         return userRepo.save(user).getId();
     }
-
 }

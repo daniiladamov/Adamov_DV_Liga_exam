@@ -3,7 +3,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   datasource:
-    url: jdbc:postgresql://localhost:5432/testdb
+    url: jdbc:postgresql://localhost:5423/testdb
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
@@ -27,6 +27,8 @@ only_weekday: true
 api_name: api/v2
 company_open: 8
 company_close: 20
+access_day_interval: 7
+access_arrived_time: 60
 
 
 jwt:

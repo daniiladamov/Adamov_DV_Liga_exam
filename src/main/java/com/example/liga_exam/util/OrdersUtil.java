@@ -35,6 +35,10 @@ public class OrdersUtil {
     private Long timeInterval;
     @Value("${only_weekday}")
     private boolean onlyWeekday;
+    @Value("${access_day_interval}")
+    private Integer dayInterval;
+    @Value("${access_arrived_time}")
+    private Integer accessArrivedTime;
 
     public OrdersUtil setFreeBox(Order order, Set<Operation> operations, User user) {
         int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
@@ -78,8 +82,14 @@ public class OrdersUtil {
         if (LocalDate.now().isAfter(orderDate))
             throw new DateTimeException(INVALID_ORDER_DATE.getMessage());
         else if (LocalDate.now().isEqual(orderDate) &&
-                LocalTime.now().isAfter(orderTime.minusMinutes(15L)))
-            throw new DateTimeException(String.format(INVALID_ORDER_TIME.getMessage(), timeInterval));
+                LocalTime.now().isAfter(orderTime.minusMinutes(15L))){
+            throw new DateTimeException(String.format(INVALID_ORDER_TIME.getMessage(),
+                    timeInterval));
+        }
+        else if (orderDate.isAfter(LocalDate.now().plusDays(dayInterval))) {
+            throw new DateTimeException(String.format(INVALID_DAY_ORDER.getMessage(),
+                    dayInterval));
+        }
         if (onlyWeekday){
             if (orderDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) ||
                     orderDate.getDayOfWeek().equals(DayOfWeek.SUNDAY))
@@ -95,11 +105,11 @@ public class OrdersUtil {
         return this;
     }
 
-    public OrdersUtil checkDateOrder(Order order) {
+    public OrdersUtil checkDateOrderDone(Order order) {
         LocalTime current = LocalTime.now();
         LocalTime start = order.getStartTime();
         LocalTime end = order.getEndTime();
-        if (current.compareTo(end) < 0 && current.compareTo(start) > 0) {
+        if (current.isBefore(end) && current.isAfter(start)) {
             order.setEndTime(LocalTime.now());
         } else if (current.compareTo(end) >= 0)
             log.info(String.format(REMARK_FOR_BOX.getMessage(), order.getBox().getId()));
@@ -150,5 +160,15 @@ public class OrdersUtil {
             throw new AuthenticationException();
         }
         return this;
+    }
+
+    public OrdersUtil checkTimeArrived(Order order) {
+        if (LocalDate.now().isEqual(order.getDate()) &&
+        LocalTime.now().isAfter(order.getStartTime().minusMinutes(accessArrivedTime)) &&
+        LocalTime.now().isBefore(order.getStartTime()))
+            return this;
+        else
+            throw new DateTimeException(String.format(INVALID_ARRIVED_TIME.getMessage(),
+                    accessArrivedTime));
     }
 }

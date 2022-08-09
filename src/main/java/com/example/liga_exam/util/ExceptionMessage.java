@@ -15,7 +15,9 @@ public enum ExceptionMessage {
     INTERSECTION_ORDER_TIME("У пользователя id#%d уже создан заказ id#%d в " +
             "этот промежуток времени"),
     NOT_WORKED_BOXES("В рабочее %s время нет открытых боксов для записи"),
-    NOT_WORK_IN_WEEKENDS("Автомойка не работает в выходные");
+    NOT_WORK_IN_WEEKENDS("Автомойка не работает в выходные"),
+    INVALID_ARRIVED_TIME("Подтвержать свой приезд можно не ранее чем за %d минут"),
+    INVALID_DAY_ORDER("Запись доступна не более %d дней наперед");
     private String message;
     ExceptionMessage(String message){
         this.message=message;

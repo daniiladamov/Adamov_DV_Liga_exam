@@ -16,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.management.relation.InvalidRoleValueException;
+import javax.naming.AuthenticationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.time.DateTimeException;
@@ -70,5 +71,10 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String verificationJwtFalls(){
         return "JWT-токен не прошел верификацию на сервере приложения";
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String operationNotAccess() {
+        return "Ошибка авторизации. Данная операция не доступна пользователю";
     }
 }
