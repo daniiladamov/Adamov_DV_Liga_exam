@@ -9,4 +9,6 @@ public interface BoxService {
     Long createBox(Box box);
 
     Box getBox(Long boxId);
+
+    void updateBox(Long id, Box updateBox);
 }

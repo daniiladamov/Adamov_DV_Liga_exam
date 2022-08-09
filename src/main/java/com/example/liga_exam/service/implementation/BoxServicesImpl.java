@@ -13,11 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BoxServicesImpl implements BoxService {
     @Value("${company_open}")
     private Integer companyOpen;
@@ -28,6 +30,7 @@ public class BoxServicesImpl implements BoxService {
     private String exceptionMessage;
 
     @Override
+    @Transactional
     public Long createBox(Box box) {
         LocalTime open=LocalTime.of(companyOpen, 0);
         LocalTime close=LocalTime.of(companyClose, 0);
@@ -43,4 +46,15 @@ public class BoxServicesImpl implements BoxService {
         return boxRepo.findById(boxId).orElseThrow(()->
                 new EntityNotFoundException(exceptionMessage+boxId));
     }
+
+    @Override
+    @Transactional
+    public void updateBox(Long id, Box updateBox) {
+        Box box=getBox(id);
+        box.setRatio(updateBox.getRatio());
+        box.setOpen(updateBox.getOpen());
+        box.setClose(updateBox.getClose());
+        createBox(box);
+    }
+
 }
