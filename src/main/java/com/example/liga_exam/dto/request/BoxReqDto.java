@@ -1,5 +1,6 @@
 package com.example.liga_exam.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,12 +12,14 @@ import java.time.LocalTime;
 public class BoxReqDto {
 
     @NotNull
-    private double ratio;
+    private Double ratio;
 
     @NotNull
+    @JsonFormat(pattern = "HH-mm")
     private LocalTime open;
 
     @NotNull
+    @JsonFormat(pattern = "HH-mm")
     private LocalTime close;
 
 }

@@ -1,17 +1,16 @@
 package com.example.liga_exam.controller;
 
 import com.example.liga_exam.dto.request.BoxReqDto;
-import com.example.liga_exam.dto.request.OrderSearch;
-import com.example.liga_exam.dto.response.BoxResDto;
 import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.mapper.BoxMapper;
 import com.example.liga_exam.service.BoxService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/boxes")
@@ -22,8 +21,8 @@ public class BoxController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Long createBox(@Validated @RequestBody BoxReqDto boxReqDto){
-        Box box=boxMapper.toEntity(boxReqDto);
+    public Long createBox(@Validated @RequestBody BoxReqDto boxReqDto) {
+        Box box = boxMapper.toEntity(boxReqDto);
         return boxService.createBox(box);
     }
 }

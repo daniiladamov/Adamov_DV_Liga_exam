@@ -7,21 +7,34 @@ import com.example.liga_exam.repository.BoxRepo;
 import com.example.liga_exam.service.BoxService;
 import com.example.liga_exam.specification.OrderSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.aop.framework.AopConfigException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @Service
 @RequiredArgsConstructor
 public class BoxServicesImpl implements BoxService {
+    @Value("${company_open}")
+    private Integer companyOpen;
+    @Value("${company_close}")
+    private Integer companyClose;
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @Override
     public Long createBox(Box box) {
+        LocalTime open=LocalTime.of(companyOpen, 0);
+        LocalTime close=LocalTime.of(companyClose, 0);
+        if (open.isAfter(box.getOpen()))
+            box.setOpen(open);
+        if (close.isBefore(box.getClose()))
+            box.setClose(close);
         return boxRepo.save(box).getId();
     }
 

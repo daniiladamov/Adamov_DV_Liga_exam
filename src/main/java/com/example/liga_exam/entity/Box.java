@@ -22,10 +22,8 @@ public class Box {
     @NotNull
     private double ratio;
 
-    @Column(columnDefinition = "time default '08:00'")
     private LocalTime open;
 
-    @Column(columnDefinition = "time default '20:00'")
     private LocalTime close;
 
     @OneToMany(mappedBy = "box", fetch = FetchType.LAZY)

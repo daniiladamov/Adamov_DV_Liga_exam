@@ -25,6 +25,9 @@ cron_interval: 0 0/5 8-22 * * ?
 check_interval: 10
 only_weekday: true
 api_name: api/v2
+company_open: 8
+company_close: 20
+
 
 jwt:
   secret_access_key: Pax Pamir
