@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PostAuthorize("hasRole('ADMIN') ||hasRole('EMPLOYEE') || returnObject.username.equals(authentication.name)")
+    @PostAuthorize("hasAnyRole('ADMIN','EMPLOYEE') || returnObject.username.equals(authentication.name)")
     public User getUserByUsername(String username) {
         return userRepo.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException(String.format(INVALID_USERNAME, username)));

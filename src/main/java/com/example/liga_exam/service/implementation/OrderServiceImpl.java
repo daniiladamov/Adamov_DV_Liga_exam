@@ -1,10 +1,7 @@
 package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.dto.request.OrderSearch;
-import com.example.liga_exam.entity.Operation;
-import com.example.liga_exam.entity.Order;
-import com.example.liga_exam.entity.OrderStatus;
-import com.example.liga_exam.entity.User;
+import com.example.liga_exam.entity.*;
 import com.example.liga_exam.exception.EntityNotFoundException;
 import com.example.liga_exam.exception.FreeBoxesNotFound;
 import com.example.liga_exam.repository.OrderRepo;
@@ -15,6 +12,7 @@ import com.example.liga_exam.util.OrdersUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -42,8 +40,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Long createOrder(Order order, Set<Operation> operations, User user) {
+    public Long createOrder(Order order, Set<Operation> operations, User user)
+            throws AuthenticationException {
         ordersUtil
+                .checkAccess(order,user)
                 .checkOrderDataTime(order)
                 .setFreeBox(order, operations, user)
                 .setCost(order, operations);
@@ -54,9 +54,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable, BoxService boxService) {
-        OrderSpecification orderSpecification = new OrderSpecification(orderSearch, boxService);
-        return orderRepo.findAll(Specification.where(orderSpecification), pageable);
+    public Page<Order> getOrders(OrderSearch orderSearch, Integer pageNumber,
+                                 Integer pageSize, Box box, User user) {
+        if (Objects.isNull(pageNumber))
+            pageNumber=0;
+        if (Objects.isNull(pageSize))
+            pageSize=5;
+        OrderSpecification orderSpecification = new OrderSpecification(orderSearch, box, user);
+        return orderRepo.findAll(Specification.where(orderSpecification),
+                PageRequest.of(pageNumber,pageSize));
     }
 
     @Override

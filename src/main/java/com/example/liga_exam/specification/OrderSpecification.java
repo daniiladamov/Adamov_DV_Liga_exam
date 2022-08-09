@@ -3,7 +3,9 @@ package com.example.liga_exam.specification;
 import com.example.liga_exam.entity.*;
 import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.entity.Order;
+import com.example.liga_exam.security.RoleEnum;
 import com.example.liga_exam.service.BoxService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,16 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class OrderSpecification implements Specification<Order> {
-    private final OrderSearch orderSearch;
-    private final BoxService boxService;
+    private OrderSearch orderSearch;
+    private Box box;
+    private User user;
 
     @Override
     public Predicate toPredicate(Root<Order> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
          List<Predicate> predicates = new ArrayList<>();
-         if (Objects.nonNull(orderSearch.getBoxId())){
-             Box box=boxService.getBox(orderSearch.getBoxId());
+         if (user.getRole().equals(RoleEnum.ROLE_EMPLOYEE))
+             box=user.getEmployee().getBox();
+         if (Objects.nonNull(box)){
              Predicate equal = criteriaBuilder.equal(root.get(Order_.BOX), box);
              predicates.add(equal);
          }

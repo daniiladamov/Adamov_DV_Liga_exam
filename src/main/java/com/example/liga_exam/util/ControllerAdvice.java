@@ -16,7 +16,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.management.relation.InvalidRoleValueException;
-import javax.naming.AuthenticationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.time.DateTimeException;
@@ -46,7 +45,8 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
             OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
-            InvalidRoleValueException.class, UserConfirmException.class, IntersectionOrderTimeException.class})
+            InvalidRoleValueException.class, UserConfirmException.class, IntersectionOrderTimeException.class,
+            NullPointerException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());

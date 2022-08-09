@@ -4,6 +4,7 @@ import com.example.liga_exam.dto.request.OrderReqDto;
 import com.example.liga_exam.dto.request.OrderSearch;
 import com.example.liga_exam.dto.request.PeriodDto;
 import com.example.liga_exam.dto.response.OrderResDto;
+import com.example.liga_exam.entity.Box;
 import com.example.liga_exam.entity.Operation;
 import com.example.liga_exam.entity.Order;
 import com.example.liga_exam.entity.User;
@@ -11,14 +12,13 @@ import com.example.liga_exam.mapper.OrderMapper;
 import com.example.liga_exam.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,19 +34,26 @@ public class OrderController {
     private final AuthService authService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN') || hasRole('USER')")
-    public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto) {
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','USER')")
+    public Long createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
+            throws AuthenticationException {
         Set<Operation> operationSet = operationService.getOperations(
                 orderReqDto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
         Order order = orderMapper.toEntity(orderReqDto);
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserByUsername(username);
+        User user = userService.getUserByUsername(authService.getUsername());
         return orderService.createOrder(order, operationSet, user);
     }
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public Page<OrderResDto> getBoxFilter(OrderSearch orderSearch, Pageable pageable) {
-        return orderService.getOrders(orderSearch, pageable, boxService)
+
+    @PostMapping("/filter")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public Page<OrderResDto> getOrders(Integer pageSize,
+                                       Integer pageNumber,
+                                       @Validated @RequestBody OrderSearch orderSearch) {
+        Box box = null;
+        if (Objects.nonNull(orderSearch.getBoxId()))
+            box = boxService.getBox(orderSearch.getBoxId());
+        User user = userService.getUserByUsername(authService.getUsername());
+        return orderService.getOrders(orderSearch, pageNumber, pageSize, box, user)
                 .map(x -> orderMapper.toResponse(x));
     }
 
@@ -58,30 +65,30 @@ public class OrderController {
 
     @PatchMapping("/{id}/customer-arrived")
     public void customerArrivedInTime(@PathVariable Long id) throws AuthenticationException {
-        User user=userService.getUserByUsername(authService.getUsername());
+        User user = userService.getUserByUsername(authService.getUsername());
         orderService.arrived(id, user);
     }
 
     @PatchMapping("/{id}/canceled-order")
     public void canceledOrder(@PathVariable Long id) throws AuthenticationException {
-        User user=userService.getUserByUsername(authService.getUsername());
+        User user = userService.getUserByUsername(authService.getUsername());
         orderService.cancel(id, user);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN') || hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','USER')")
     public void changeOrder(@PathVariable Long id, @Validated @RequestBody OrderReqDto dto)
             throws AuthenticationException {
-        User user=userService.getUserByUsername(authService.getUsername());
+        User user = userService.getUserByUsername(authService.getUsername());
         Set<Operation> operationSet = operationService.getOperations(
                 dto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
-        orderService.updateOrder(id,orderMapper.toEntity(dto), operationSet, user);
+        orderService.updateOrder(id, orderMapper.toEntity(dto), operationSet, user);
     }
 
     @PatchMapping("/{id}/done-order")
-    @PreAuthorize("hasAnyRole('ADMIN') || hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public BigDecimal doneOrder(@PathVariable Long id, Integer discount) throws AuthenticationException {
-        User user=userService.getUserByUsername(authService.getUsername());
-        return orderService.doneOrder(id,discount, user);
+        User user = userService.getUserByUsername(authService.getUsername());
+        return orderService.doneOrder(id, discount, user);
     }
 }
