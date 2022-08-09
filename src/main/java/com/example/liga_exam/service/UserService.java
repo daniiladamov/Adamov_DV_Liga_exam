@@ -11,4 +11,6 @@ public interface UserService {
     User getUserByUsername(String username);
 
     Long createUser(User user);
+
+    void removeUser(User user);
 }

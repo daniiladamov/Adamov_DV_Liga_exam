@@ -29,6 +29,7 @@ company_open: 8
 company_close: 20
 access_day_interval: 7
 access_arrived_time: 60
+default_password: passw0rd
 
 
 jwt:

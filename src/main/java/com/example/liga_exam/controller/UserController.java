@@ -50,4 +50,11 @@ public class UserController {
         Box box = boxService.getBox(dto.getBoxId());
         return employeeService.createEmployee(user, box);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public void deleteUser(@PathVariable Long id) {
+        User user=userService.getUser(id);
+        userService.removeUser(user);
+    }
 }

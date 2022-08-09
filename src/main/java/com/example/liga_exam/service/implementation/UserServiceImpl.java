@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
+
+import static com.example.liga_exam.security.RoleEnum.REMOVED;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
+    @Value("${default_password}")
+    private String defaultPassword;
     private final static String INVALID_USERNAME = "Пользователя с username:%s не существует";
 
     @Override
@@ -50,5 +55,17 @@ public class UserServiceImpl implements UserService {
         ));
         user.setRole(RoleEnum.ROLE_USER);
         return userRepo.save(user).getId();
+    }
+
+    @Override
+    @Transactional
+    public void removeUser(User user) {
+        user.setRole(REMOVED);
+        user.setFirstName("removed");
+        user.setLastName("removed");
+        user.setSurname(null);
+        user.setUsername(UUID.randomUUID().toString());
+        user.setPassword(passwordEncoder.encode(defaultPassword));
+        userRepo.save(user);
     }
 }
