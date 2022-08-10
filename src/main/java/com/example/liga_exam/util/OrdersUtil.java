@@ -118,7 +118,7 @@ public class OrdersUtil {
         return this;
     }
 
-    public OrdersUtil checkDiscountOrder(Order order, Integer discount, User user) {
+    public OrdersUtil checkDiscountOrder(Integer discount, User user) {
         if (Objects.nonNull(discount)) {
             Employee employee = user.getEmployee();
             if (Objects.nonNull(employee) && Objects.isNull(employee.getDiscountMin())) {
@@ -126,15 +126,10 @@ public class OrdersUtil {
             }
             if (
                     Objects.nonNull(employee) &&
-                            (discount < employee.getDiscountMin() || discount > employee.getDiscountMax())
-            ) {
+                            (discount < employee.getDiscountMin() || discount > employee.getDiscountMax())){
                 throw new DiscountException(String.format(INVALID_DISCOUNT.getMessage(),
                         employee.getDiscountMin(), employee.getDiscountMax()));
             }
-            BigDecimal percent = new BigDecimal(100 - discount);
-            BigDecimal updateCost = order.getCost().scaleByPowerOfTen(-2).multiply(percent)
-                    .setScale(2, RoundingMode.CEILING);
-            order.setCost(updateCost);
         }
         return this;
     }
@@ -170,5 +165,10 @@ public class OrdersUtil {
         else
             throw new DateTimeException(String.format(INVALID_ARRIVED_TIME.getMessage(),
                     accessArrivedTime));
+    }
+    public OrdersUtil checkOrderConform(Order order){
+        if (order.getConfirm())
+            throw new OrderConfirmException(REPEAT_CONFIRM.getMessage());
+        return this;
     }
 }
