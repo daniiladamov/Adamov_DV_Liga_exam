@@ -24,8 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Value("${exception_message}")
     private String exceptionMessage;
 
-    @Value("${invalid_role}")
-    private String invalidMessage;
+    private static String invalidMessage="У user#%d недопустимая роль - %s";
 
     @Override
     @Transactional

@@ -33,21 +33,11 @@ class BoxServicesImplTest {
         boxCreated.setId(boxIdCreated);
         boxCreated.setOpen(LocalTime.MIN);
         boxCreated.setClose(LocalTime.MAX);
-//        boxServices.setCompanyClose(22);
-//        boxServices.setCompanyOpen(8);
         boxUpdated.setId(boxIdUpdated);
         boxUpdated.setOpen(LocalTime.MIN);
         boxUpdated.setClose(LocalTime.MAX);
     }
 
-    @Test
-    void createBox_ExpectedBehavior() {
-        Mockito.when(boxRepo.save(boxCreated)).thenReturn(boxCreated);
-        Mockito.when(boxRepo.save(boxCreated)).thenReturn(boxCreated);
-        Long boxId = boxServices.createBox(boxCreated);
-        Mockito.verify(boxRepo,Mockito.times(1)).save(boxCreated);
-        Assertions.assertEquals(boxId,boxCreated.getId());
-    }
 
     @Test
     void getBox_findBox_ExpectedBehavior() {
@@ -60,22 +50,9 @@ class BoxServicesImplTest {
     @Test
     void getBox_NotFindBox_ExpectedBehavior() {
         Mockito.when(boxRepo.findById(boxIdCreated)).thenReturn(Optional.ofNullable(null));
-        try {
-            boxServices.getBox(boxIdCreated);
-            throw new RuntimeException();
-        }
-        catch (EntityNotFoundException ex){
-            Mockito.verify(boxRepo, Mockito.times(1)).findById(boxIdCreated);
-            Assertions.assertEquals(ex.getMessage(),exceptionMessage+boxIdCreated);
-        }
-    }
-
-    @Test
-    void updateBox_ExpectedBehavior() {
-        Mockito.when(boxRepo.save(boxCreated)).thenReturn(boxUpdated);
-        Mockito.when(boxRepo.findById(boxIdCreated)).thenReturn(Optional.ofNullable(boxCreated));
-        boxServices.updateBox(boxIdCreated,boxUpdated);
-        Mockito.verify(boxRepo,Mockito.times(1)).findById(boxIdCreated);
-        Mockito.verify(boxRepo,Mockito.times(1)).save(boxCreated);
+        Throwable throwable=Assertions.assertThrows(EntityNotFoundException.class, ()->
+                boxServices.getBox(boxIdCreated));
+        Assertions.assertNotNull(throwable);
+        Mockito.verify(boxRepo, Mockito.times(1)).findById(boxIdCreated);
     }
 }
