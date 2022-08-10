@@ -35,7 +35,7 @@ public interface OrderService {
 
     Page<Order> getOrders(Specification<Order> specification, Pageable pageable);
 
-    void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user)
+    String updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user)
             throws AuthenticationException;
 
     void arrived(Long id, User user) throws AuthenticationException;

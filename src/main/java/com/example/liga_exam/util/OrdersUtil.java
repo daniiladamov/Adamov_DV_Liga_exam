@@ -109,9 +109,10 @@ public class OrdersUtil {
         LocalTime current = LocalTime.now();
         LocalTime start = order.getStartTime();
         LocalTime end = order.getEndTime();
-        if (current.isBefore(end) && current.isAfter(start)) {
+        LocalDate date=order.getDate();
+        if (current.isBefore(end) && current.isAfter(start) && LocalDate.now().isEqual(date))
             order.setEndTime(LocalTime.now());
-        } else if (current.compareTo(end) >= 0)
+        else if (current.isAfter(end) && LocalDate.now().isEqual(date))
             log.info(String.format(REMARK_FOR_BOX.getMessage(), order.getBox().getId()));
         else
             throw new DateTimeException(String.format(EXCEPTION_TIME.getMessage(), start.toString()));

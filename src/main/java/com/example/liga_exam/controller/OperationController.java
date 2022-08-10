@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/services")
+@RequestMapping("api/operations")
 @RequiredArgsConstructor
 public class OperationController {
     private final OperationService operationService;

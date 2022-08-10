@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = FreeBoxesNotFound.class)
-    public void updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user)
+    public String updateOrder(Long id, Order updatedOrder, Set<Operation> operations, User user)
             throws AuthenticationException {
         Order order = getOrder(id);
         ordersUtil
@@ -68,8 +68,9 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepo.save(order);
         order.setStartTime(updatedOrder.getStartTime());
+        order.setConfirm(false);
         order.setDate(updatedOrder.getDate());
-        createOrder(order, operations, user);
+        return createOrder(order, operations, order.getUser());
     }
 
     @Override
@@ -78,8 +79,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrder(id);
         ordersUtil
                 .checkAccess(order, user)
-                .checkTimeArrived(order)
-                .checkOrderStatus(order);
+                .checkOrderStatus(order)
+                .checkTimeArrived(order);
         order.setOrderStatus(OrderStatus.ACTIVE_ARRIVED);
         orderRepo.save(order);
     }

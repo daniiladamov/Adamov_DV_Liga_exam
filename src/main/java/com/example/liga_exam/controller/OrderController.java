@@ -37,7 +37,7 @@ public class OrderController {
     private final static String CONFIRM_REGISTRATION = "Запись подтверждена, номер заказа id=";
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public String createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
             throws AuthenticationException {
         Set<Operation> operationSet = operationService.getOperations(
@@ -79,7 +79,7 @@ public class OrderController {
         orderService.arrived(id, user);
     }
 
-    @PatchMapping("/{id}/canceled-order")
+    @PatchMapping("/{id}/cancel-order")
     public void canceledOrder(@PathVariable Long id) throws AuthenticationException {
         User user = userService.getUserByUsername(authService.getUsername());
         orderService.cancel(id, user);
@@ -87,12 +87,12 @@ public class OrderController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','USER')")
-    public void changeOrder(@PathVariable Long id, @Validated @RequestBody OrderReqDto dto)
+    public String changeOrder(@PathVariable Long id, @Validated @RequestBody OrderReqDto dto)
             throws AuthenticationException {
         User user = userService.getUserByUsername(authService.getUsername());
         Set<Operation> operationSet = operationService.getOperations(
                 dto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
-        orderService.updateOrder(id, orderMapper.toEntity(dto), operationSet, user);
+        return orderService.updateOrder(id, orderMapper.toEntity(dto), operationSet, user);
     }
 
     @PatchMapping("/{id}/done-order")

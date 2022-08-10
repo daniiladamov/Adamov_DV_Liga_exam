@@ -16,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DateTimeException;
 import java.time.LocalTime;
+
+import static com.example.liga_exam.util.ExceptionMessage.INVALID_INTERVAL;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,8 @@ public class BoxServicesImpl implements BoxService {
             box.setOpen(open);
         if (close.isBefore(box.getClose()))
             box.setClose(close);
+        if(box.getOpen().isAfter(box.getClose()))
+            throw new DateTimeException(INVALID_INTERVAL.getMessage());
         return boxRepo.save(box).getId();
     }
 

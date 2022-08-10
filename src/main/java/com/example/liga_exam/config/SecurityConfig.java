@@ -11,9 +11,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -32,19 +34,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.
                 csrf().disable().
                 authorizeRequests().
-                antMatchers(HttpMethod.GET,"/api/orders/*").anonymous().
+                antMatchers(HttpMethod.GET,"/api/orders/**").anonymous().
                 antMatchers(HttpMethod.POST, "/api/auth/*").anonymous().
                 anyRequest().authenticated().
                 and().
-//                addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
+                addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
                 formLogin().defaultSuccessUrl("/swagger-ui/#").
                 and().
                 httpBasic(Customizer.withDefaults()).
                 logout().logoutUrl("/logout").
                 logoutSuccessUrl("/login")
-//                .and().
-//                sessionManagement().
-//                sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().
+                sessionManagement().
+                sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 ;
     }
 
