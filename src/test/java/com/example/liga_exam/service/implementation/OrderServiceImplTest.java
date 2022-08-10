@@ -109,12 +109,16 @@ class OrderServiceImplTest {
         Mockito.when(ordersUtil.checkAccess(order, user)).thenReturn(ordersUtil);
         Mockito.when(ordersUtil.checkOrderStatus(order)).thenReturn(ordersUtil);
         Mockito.when(ordersUtil.checkOrderDataTime(order)).thenReturn(ordersUtil);
-        Mockito.when(ordersUtil.setCost(order, operations)).thenReturn(ordersUtil);
         Mockito.when(ordersUtil.setFreeBox(order, operations,user)).thenThrow(FreeBoxesNotFound.class);
 
         Throwable throwable=Assertions.assertThrows(FreeBoxesNotFound.class,()->
                 orderService.updateOrder(id,updatedOrder,operations,user));
         Assertions.assertNotNull(throwable);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkAccess(order, user);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkOrderStatus(order);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkOrderDataTime(order);
+        Mockito.verify(orderRepo, Mockito.times(1)).findById(id);
+        Mockito.verify(orderRepo, Mockito.times(1)).save(order);
     }
     @Test
     void updateOrder_WithCancelOrderAfterOneMinute_ExpectedBehavior() throws AuthenticationException, InterruptedException {
