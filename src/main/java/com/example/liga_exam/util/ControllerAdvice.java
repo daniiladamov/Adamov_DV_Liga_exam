@@ -2,6 +2,7 @@ package com.example.liga_exam.util;
 
 import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.liga_exam.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -46,19 +47,14 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DiscountException.class, EntityNotFoundException.class, FreeBoxesNotFound.class,
             OrderWasCanceledException.class, OrderWasDoneException.class,RepeatedArrivedException.class,
-            InvalidRoleValueException.class, OrderConfirmException.class, IntersectionOrderTimeException.class})
+            InvalidRoleValueException.class, OrderConfirmException.class, IntersectionOrderTimeException.class,
+            TokenExpiredException.class, DateTimeException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String expectedExceptions(Exception exception){
         log.error(exception.getMessage());
         return exception.getMessage();
     }
 
-    @ExceptionHandler(DateTimeException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String expectedExceptions(DateTimeException exception){
-        log.error(exception.getMessage());
-        return exception.getMessage();
-    }
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String validateFallResponse(ConstraintViolationException ex) {
@@ -67,11 +63,13 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
                 + e.getMessage()).collect(Collectors.joining("\n"));
 
     }
+
     @ExceptionHandler({JWTVerificationException.class, IncorrectClaimException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String verificationJwtFalls(){
         return "JWT-токен не прошел верификацию на сервере приложения";
     }
+
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String operationNotAccess() {

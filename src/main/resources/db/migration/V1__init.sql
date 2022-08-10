@@ -27,6 +27,15 @@ alter table if exists order_operation add constraint FKq63mqdm9abe2kw0hsa1qh4pdw
 alter table if exists orders add constraint FK1cci2xp4x6vjsrgipxr7fa4eu foreign key (box_id) references boxes;
 alter table if exists orders add constraint FK32ql8ubntj5uh44ph9659tiih foreign key (user_id) references users;
 
+create index order_status_idx on orders using hash(order_status);
+create index order_user_id_idx on orders using hash(user_id);
+create index order_date_idx on orders using btree("date");
+create index order_start_time_idx on orders using btree(start_time);
+create index order_end_time_idx on orders using btree(end_time);
+create index order_box_id_idx on orders using hash(box_id);
+
+create index employee_box_id_idx on employees using hash(box_id);
+
 
 insert into boxes(ratio) values (1.1), (1.2), (0.8);
 
@@ -43,7 +52,7 @@ insert into employees(box_id, user_id)values (1, 2), (2,5), (3,6);
 insert into operations(cost, duration, name) values (300, 15,'мойка базовая'), (1200, 25,'химчистка салона'),
 (200, 10,'мойка двигателя'), (250, 8,'сушка'), (400,16,'полировка');
 
-insert into orders ("date",start_time,end_time,user_id,box_id,cost)
-values (current_date,'15:00:00','15:15:00',3,1,200),(current_date,'15:10:00','15:25:00',4,2,300),
-       (current_date,'15:10:00','15:35:00',3,3,250),(current_date,'13:00:00','13:15:00',4,1,200),
-       (current_date,'13:10:00','13:25:00',4,2,300),(current_date,'13:10:00','13:35:00',3,3,250);
+insert into orders ("date",start_time,end_time,user_id,box_id,cost, order_status)
+values (current_date,'15:00:00','15:15:00',3,1,200,'CANCELED'),(current_date,'15:10:00','15:25:00',4,2,300,'CANCELED'),
+       (current_date,'15:10:00','15:35:00',3,3,250,'CANCELED'),(current_date,'13:00:00','13:15:00',4,1,200,'CANCELED'),
+       (current_date,'13:10:00','13:25:00',4,2,300,'CANCELED'),(current_date,'13:10:00','13:35:00',3,3,250,'CANCELED');
