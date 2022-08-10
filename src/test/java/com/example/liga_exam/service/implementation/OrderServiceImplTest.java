@@ -45,7 +45,6 @@ class OrderServiceImplTest {
     private Long id = 1L;
     private Pageable pageable;
     private BigDecimal cost = new BigDecimal(100).setScale(2, RoundingMode.CEILING);
-    ;
     private Operation operation;
     private Set<Operation> operations;
     private Employee employee;
@@ -97,9 +96,22 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void updateOrder() {
+    void updateOrder_WithCancelOrderAfterOneMinute_ExpectedBehavior() throws AuthenticationException {
+        Order updatedOrder=new Order();
 
+        Mockito.when(orderRepo.findById(id)).thenReturn(Optional.ofNullable(order));
+        Mockito.when(orderRepo.save(order)).thenReturn(order);
+        Mockito.when(ordersUtil.checkAccess(order, user)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.checkOrderStatus(order)).thenReturn(ordersUtil);
+
+        orderService.updateOrder(id,);
+
+        Mockito.verify(orderRepo, Mockito.times(1)).findById(id);
+        Mockito.verify(orderRepo, Mockito.times(1)).save(order);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkAccess(order, user);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkOrderStatus(order);
     }
+
 
     @Test
     void createOrder_WithCancelOrderAfterOneMinute_ExpectedBehavior()
