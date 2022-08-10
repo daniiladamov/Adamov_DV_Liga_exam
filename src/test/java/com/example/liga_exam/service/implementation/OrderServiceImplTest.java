@@ -2,6 +2,7 @@ package com.example.liga_exam.service.implementation;
 
 import com.example.liga_exam.entity.*;
 import com.example.liga_exam.exception.EntityNotFoundException;
+import com.example.liga_exam.exception.FreeBoxesNotFound;
 import com.example.liga_exam.exception.OrderConfirmException;
 import com.example.liga_exam.repository.OrderRepo;
 import com.example.liga_exam.service.OrderService;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -96,20 +98,54 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void updateOrder_WithCancelOrderAfterOneMinute_ExpectedBehavior() throws AuthenticationException {
+    void updateOrder_NoFreeBoxesRollback_ExpectedBehavior() throws AuthenticationException, InterruptedException {
         Order updatedOrder=new Order();
+        updatedOrder.setStartTime(LocalTime.now().plusMinutes(10));
+        updatedOrder.setDate(LocalDate.now().plusDays(1));
+        updatedOrder.setOperations(Set.of(new Operation(),operation));
 
         Mockito.when(orderRepo.findById(id)).thenReturn(Optional.ofNullable(order));
         Mockito.when(orderRepo.save(order)).thenReturn(order);
         Mockito.when(ordersUtil.checkAccess(order, user)).thenReturn(ordersUtil);
         Mockito.when(ordersUtil.checkOrderStatus(order)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.checkOrderDataTime(order)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.setCost(order, operations)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.setFreeBox(order, operations,user)).thenThrow(FreeBoxesNotFound.class);
 
-        orderService.updateOrder(id,);
+        Throwable throwable=Assertions.assertThrows(FreeBoxesNotFound.class,()->
+                orderService.updateOrder(id,updatedOrder,operations,user));
+        Assertions.assertNotNull(throwable);
+    }
+    @Test
+    void updateOrder_WithCancelOrderAfterOneMinute_ExpectedBehavior() throws AuthenticationException, InterruptedException {
+        Order updatedOrder=new Order();
+        updatedOrder.setStartTime(LocalTime.now());
+        updatedOrder.setDate(LocalDate.now());
+        updatedOrder.setOperations(operations);
 
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(id);
-        Mockito.verify(orderRepo, Mockito.times(1)).save(order);
+        Mockito.when(orderRepo.findById(id)).thenReturn(Optional.ofNullable(order));
+        Mockito.when(orderRepo.save(order)).thenReturn(order);
+        Mockito.when(ordersUtil.checkAccess(order, user)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.checkOrderStatus(order)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.checkOrderDataTime(order)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.setCost(order, operations)).thenReturn(ordersUtil);
+        Mockito.when(ordersUtil.setFreeBox(order, operations,user)).thenReturn(ordersUtil);
+
+        orderService.updateOrder(id,updatedOrder,operations,user);
+
+        Assertions.assertEquals(ACTIVE,order.getOrderStatus());
+        Assertions.assertFalse(order.getConfirm());
+        Assertions.assertEquals(Set.of(operation),order.getOperations());
+
         Mockito.verify(ordersUtil,Mockito.times(1)).checkAccess(order, user);
         Mockito.verify(ordersUtil,Mockito.times(1)).checkOrderStatus(order);
+        Mockito.verify(ordersUtil,Mockito.times(1)).checkOrderDataTime(order);
+        Mockito.verify(ordersUtil,Mockito.times(1)).setCost(order, operations);
+
+        TimeUnit.MINUTES.sleep(1);
+        Assertions.assertEquals(CANCELED,order.getOrderStatus());
+        Mockito.verify(orderRepo, Mockito.times(2)).findById(id);
+        Mockito.verify(orderRepo, Mockito.times(3)).save(order);
     }
 
 
