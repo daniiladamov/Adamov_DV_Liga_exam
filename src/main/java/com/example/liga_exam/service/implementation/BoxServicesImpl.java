@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DateTimeException;
 import java.time.LocalTime;
+import java.util.Objects;
 
 import static com.example.liga_exam.util.ExceptionMessage.INVALID_INTERVAL;
 
@@ -31,7 +32,7 @@ public class BoxServicesImpl implements BoxService {
     private Integer companyClose;
     private final BoxRepo boxRepo;
     @Value("${exception_message}")
-    private static String exceptionMessage;
+    private String exceptionMessage;
 
     @Override
     @Transactional
@@ -49,6 +50,8 @@ public class BoxServicesImpl implements BoxService {
 
     @Override
     public Box getBox(Long boxId) {
+        if (Objects.isNull(boxId))
+            return null;
         return boxRepo.findById(boxId).orElseThrow(()->
                 new EntityNotFoundException(exceptionMessage+boxId));
     }

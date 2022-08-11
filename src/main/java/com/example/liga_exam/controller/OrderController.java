@@ -54,12 +54,9 @@ public class OrderController {
 
     @PostMapping("/filter")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
-    public Page<OrderResDto> getOrders(Integer pageSize,
-                                       Integer pageNumber,
+    public Page<OrderResDto> getOrders(Integer pageSize, Integer pageNumber,
                                        @Validated @RequestBody OrderSearch orderSearch) {
-        Box box = null;
-        if (Objects.nonNull(orderSearch.getBoxId()))
-            box = boxService.getBox(orderSearch.getBoxId());
+        Box box = boxService.getBox(orderSearch.getBoxId());
         User user = userService.getUserByUsername(authService.getUsername());
         Pageable pageable= Utils.getPageable(pageNumber, pageSize);
         return orderService.getOrders(orderSearch, pageable, box, user)

@@ -59,6 +59,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String validateFallResponse(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        log.error(ex.getMessage());
         return constraintViolations.stream().map(e -> e.getPropertyPath().toString() + ":"
                 + e.getMessage()).collect(Collectors.joining("\n"));
 
@@ -67,12 +68,14 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler({JWTVerificationException.class, IncorrectClaimException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String verificationJwtFalls(){
+
         return "JWT-токен не прошел верификацию на сервере приложения";
     }
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String operationNotAccess() {
+
         return "Ошибка авторизации. Данная операция не доступна пользователю";
     }
 }

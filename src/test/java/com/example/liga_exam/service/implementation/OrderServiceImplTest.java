@@ -147,6 +147,7 @@ class OrderServiceImplTest {
         Mockito.verify(ordersUtil,Mockito.times(1)).setCost(order, operations);
 
         TimeUnit.MINUTES.sleep(1);
+        TimeUnit.SECONDS.sleep(10);
         Assertions.assertEquals(CANCELED,order.getOrderStatus());
         Mockito.verify(orderRepo, Mockito.times(2)).findById(id);
         Mockito.verify(orderRepo, Mockito.times(3)).save(order);
@@ -174,6 +175,7 @@ class OrderServiceImplTest {
         Mockito.verify(ordersUtil,Mockito.times(1)).setCost(createdOrder, operations);
 
         TimeUnit.MINUTES.sleep(1);
+        TimeUnit.SECONDS.sleep(10);
         Assertions.assertEquals(CANCELED,createdOrder.getOrderStatus());
         Mockito.verify(orderRepo, Mockito.times(1)).findById(id);
         Mockito.verify(orderRepo, Mockito.times(2)).save(createdOrder);

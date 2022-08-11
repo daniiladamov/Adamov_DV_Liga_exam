@@ -18,7 +18,6 @@ spring:
 #        format_sql: true
 
 exception_message: Сущность не найдена, проверьте id=
-
 time_period: 15
 cron_interval: 0 0/5 8-22 * * ?
 check_interval: 10
@@ -34,6 +33,6 @@ default_password: passw0rd
 jwt:
   secret_access_key: Pax Pamir
   secret_refresh_key: Pax Renaissance
-  life_time_access: 3
+  life_time_access: 10
   life_time_refresh: 60
   subject: User details
