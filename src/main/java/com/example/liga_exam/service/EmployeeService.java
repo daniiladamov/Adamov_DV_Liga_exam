@@ -7,7 +7,6 @@ import com.example.liga_exam.entity.User;
 import javax.management.relation.InvalidRoleValueException;
 
 public interface EmployeeService {
-
     void setDiscount(Long id, int min, int max);
 
     Employee getEmployee(Long id);

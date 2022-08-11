@@ -25,9 +25,10 @@ as int)*interval '1 minute' as time)
 and
 o.end_time between make_time(:h, :m,0) and cast(make_time(:h, :m,0) +cast(ceil(b.ratio *:duration)  as int)
 *interval '1 minute' as time)
+    )
 )
-)
-""" , nativeQuery = true)
+""" ,
+            nativeQuery = true)
     List<Box> getBusyBoxes(@Param("date") LocalDate date,
                            @Param("h") int hour,
                            @Param("m") int minute,
@@ -40,8 +41,10 @@ where
 ((make_time(:h, :m,0) between b."open" and b."close") and
 cast(make_time(:h, :m,0) +interval '1 minute'*cast(ceil(b.ratio *:duration) as int) as time)
 between b."open" and b."close")
-""" , nativeQuery = true)
-    List<Box> getOpenBoxesWithEmployee(@Param("h") int hour, @Param("m") int minute,
-                           @Param("duration") int duration);
+""" ,
+            nativeQuery = true)
+    List<Box> getOpenBoxesWithEmployee(@Param("h") int hour,
+                                       @Param("m") int minute,
+                                       @Param("duration") int duration);
 
 }

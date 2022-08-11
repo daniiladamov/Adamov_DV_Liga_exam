@@ -1,7 +1,6 @@
 package com.example.liga_exam.validator.annotation;
 
 import com.example.liga_exam.validator.ExistingBoxValidator;
-import com.example.liga_exam.validator.UniqueUsernameValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -15,6 +14,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ExistingBoxValidator.class)
 public @interface ExistingBox {
     String message() default "указаного бокса не существует";
-    Class<?>[] groups() default { };
-    Class<? extends Payload>[] payload() default { };
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 }

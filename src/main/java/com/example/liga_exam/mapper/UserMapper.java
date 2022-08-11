@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserMapper {
     UserAppDto toAppDto(User user);
+
     UserResDto toResponse(User user);
 
     User toEntity(UserRegisterDto dto);

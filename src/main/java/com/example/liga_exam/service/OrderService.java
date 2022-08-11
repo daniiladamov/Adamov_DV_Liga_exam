@@ -41,5 +41,6 @@ public interface OrderService {
     void arrived(Long id, User user) throws AuthenticationException;
 
     Long confirmOrder(Long id);
+
     void cancelNotConfirmOrder(Long id);
 }

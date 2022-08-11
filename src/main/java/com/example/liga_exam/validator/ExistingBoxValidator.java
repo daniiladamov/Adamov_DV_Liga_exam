@@ -17,7 +17,6 @@ import java.util.Optional;
 public class ExistingBoxValidator implements ConstraintValidator<ExistingBox, Long> {
     private final BoxRepo boxRepo;
 
-
     @Override
     public void initialize(ExistingBox constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);

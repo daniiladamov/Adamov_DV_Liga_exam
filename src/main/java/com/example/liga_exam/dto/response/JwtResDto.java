@@ -10,6 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JwtResDto {
+
     private String accessToken;
+
     private String refreshToken;
 }

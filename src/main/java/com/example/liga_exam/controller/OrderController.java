@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +45,7 @@ public class OrderController {
         User user = userService.getUserByUsername(authService.getUsername());
         return orderService.createOrder(order, operationSet, user);
     }
+
     @GetMapping("/{id}/confirm")
     public String confirmRegistration(@PathVariable Long id) {
         orderService.confirmOrder(id);
@@ -58,7 +58,7 @@ public class OrderController {
                                        @Validated @RequestBody OrderSearch orderSearch) {
         Box box = boxService.getBox(orderSearch.getBoxId());
         User user = userService.getUserByUsername(authService.getUsername());
-        Pageable pageable= Utils.getPageable(pageNumber, pageSize);
+        Pageable pageable = Utils.getPageable(pageNumber, pageSize);
         return orderService.getOrders(orderSearch, pageable, box, user)
                 .map(x -> orderMapper.toResponse(x));
     }

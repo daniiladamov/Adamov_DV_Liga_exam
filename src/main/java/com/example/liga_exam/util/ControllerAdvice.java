@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class ControllerAdvice extends ResponseEntityExceptionHandler {
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers,

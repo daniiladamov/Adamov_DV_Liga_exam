@@ -12,9 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.yaml.snakeyaml.tokens.FlowMappingEndToken;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static com.example.liga_exam.security.RoleEnum.REMOVED;
@@ -32,14 +30,16 @@ public class UserServiceImpl implements UserService {
     private final static String INVALID_USERNAME = "Пользователя с username:%s не существует";
 
     @Override
-    @PostAuthorize("hasRole('ADMIN') || returnObject.username.equals(authentication.name)")
+    @PostAuthorize("hasRole('ADMIN') || " +
+            "returnObject.username.equals(authentication.name)")
     public User getUser(Long id) {
         return userRepo.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(exceptionMessage + id));
     }
 
     @Override
-    @PostAuthorize("hasAnyRole('ADMIN','EMPLOYEE') || returnObject.username.equals(authentication.name)")
+    @PostAuthorize("hasAnyRole('ADMIN','EMPLOYEE') || " +
+            "returnObject.username.equals(authentication.name)")
     public User getUserByUsername(String username) {
         return userRepo.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException(String.format(INVALID_USERNAME, username)));
@@ -58,7 +58,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void removeUser(User user) {
-        Map<Integer,String> map;
         user.setRole(REMOVED);
         user.setFirstName("removed");
         user.setLastName("removed");
@@ -67,5 +66,4 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(defaultPassword));
         userRepo.save(user);
     }
-
 }

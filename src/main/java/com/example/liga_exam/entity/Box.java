@@ -17,6 +17,7 @@ import java.util.Set;
 @Setter
 @Table(name = "boxes")
 public class Box {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

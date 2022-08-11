@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @Table(name = "operations", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 public class Operation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

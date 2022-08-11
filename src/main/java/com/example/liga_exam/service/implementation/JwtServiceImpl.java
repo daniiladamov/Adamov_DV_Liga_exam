@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -37,6 +38,7 @@ public class JwtServiceImpl implements JwtService {
     private String apiName;
 
     @Override
+    @Transactional
     public String generateToken(String username, String secretKey, int lifeTime, String uuid) {
         User user = userRepo.findByUsername(username).orElseThrow(()->
                 new UsernameNotFoundException("Пользователь не найден"));
@@ -75,6 +77,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public String validateJwtRefreshToken(String jwtToken) {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretRefreshKey))
                 .withSubject(subject)

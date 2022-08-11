@@ -25,9 +25,11 @@ o.start_time between make_time(:h, :m,0) and cast(make_time(:h, :m,0) +cast(ceil
 *interval '1 minute' as time)
 and
 o.end_time between make_time(:h, :m,0) and cast(make_time(:h, :m,0) +cast(ceil(b.ratio *:duration)  as int)
-*interval '1 minute' as time))
+*interval '1 minute' as time)
+    )
 )
-""",nativeQuery = true)
+""",
+            nativeQuery = true)
     List<Order> getOrderBetweenTime(@Param("date") LocalDate date,
                                     @Param("h") int hour,
                                     @Param("m") int minute,

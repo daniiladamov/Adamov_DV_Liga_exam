@@ -82,7 +82,7 @@ public class OrdersUtil {
         if (LocalDate.now().isAfter(orderDate))
             throw new DateTimeException(INVALID_ORDER_DATE.getMessage());
         else if (LocalDate.now().isEqual(orderDate) &&
-                LocalTime.now().isAfter(orderTime.minusMinutes(15L))){
+                LocalTime.now().isAfter(orderTime.minusMinutes(timeInterval/60))){
             throw new DateTimeException(String.format(INVALID_ORDER_TIME.getMessage(),
                     timeInterval/60));
         }
@@ -167,6 +167,7 @@ public class OrdersUtil {
             throw new DateTimeException(String.format(INVALID_ARRIVED_TIME.getMessage(),
                     accessArrivedTime));
     }
+
     public OrdersUtil checkOrderConform(Order order){
         if (order.getConfirm())
             throw new OrderConfirmException(REPEAT_CONFIRM.getMessage());

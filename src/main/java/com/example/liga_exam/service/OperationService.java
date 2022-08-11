@@ -10,6 +10,8 @@ import java.util.Set;
 
 public interface OperationService {
     Long createService(Operation service);
+
     Set<Operation> getOperations(Set<Long> ids);
+
     Page<Operation> getOperations(Pageable pageable);
 }
