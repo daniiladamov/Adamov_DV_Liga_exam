@@ -3,22 +3,22 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   datasource:
-    url: jdbc:postgresql://localhost:5423/testdb
+    url: jdbc:postgresql://localhost:5432/testdb
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
+  flyway:
+    baseline-on-migrate: true
 #    show-sql: true
-    flyway:
-      baseline-on-migrate: true
 #    properties:
 #      hibernate:
 #        format_sql: true
 
 exception_message: Сущность не найдена, проверьте id=
-time_period: 15
+time_period: 900
 cron_interval: 0 0/5 8-22 * * ?
 check_interval: 10
 only_weekday: true

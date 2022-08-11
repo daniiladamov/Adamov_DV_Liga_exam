@@ -41,7 +41,7 @@ public class OrdersUtil {
     private Integer accessArrivedTime;
 
     public OrdersUtil setFreeBox(Order order, Set<Operation> operations, User user) {
-        int duration = operations.stream().mapToInt(o -> o.getDuration()).sum();
+        int duration = operations.stream().mapToInt(Operation::getDuration).sum();
         LocalTime startTime = order.getStartTime();
         List<Box> openBoxes=boxRepo.getOpenBoxesWithEmployee(startTime.getHour(),
                 startTime.getMinute(), duration);
@@ -84,7 +84,7 @@ public class OrdersUtil {
         else if (LocalDate.now().isEqual(orderDate) &&
                 LocalTime.now().isAfter(orderTime.minusMinutes(15L))){
             throw new DateTimeException(String.format(INVALID_ORDER_TIME.getMessage(),
-                    timeInterval));
+                    timeInterval/60));
         }
         else if (orderDate.isAfter(LocalDate.now().plusDays(dayInterval))) {
             throw new DateTimeException(String.format(INVALID_DAY_ORDER.getMessage(),
@@ -99,9 +99,9 @@ public class OrdersUtil {
     }
 
     public OrdersUtil setCost(Order order, Set<Operation> operations) {
-        BigDecimal cost = operations.stream().map(op -> op.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
-        cost.setScale(2, RoundingMode.CEILING);
-        order.setCost(cost);
+        BigDecimal cost = operations.stream().map(Operation::getCost).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal scaleCost = cost.setScale(2, RoundingMode.CEILING);
+        order.setCost(scaleCost);
         return this;
     }
 

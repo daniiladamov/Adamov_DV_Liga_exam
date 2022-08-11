@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
         Order saveOrder = orderRepo.save(order);
         CompletableFuture.runAsync(() -> {
             try {
-                TimeUnit.MINUTES.sleep(timeForConfirm);
+                TimeUnit.SECONDS.sleep(timeForConfirm);
                 cancelNotConfirmOrder(saveOrder.getId());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
         }
         List<Order> revenue = orderRepo.findAll(Specification.where(
                 OrderSpecification.revenuePredicate(fromDate, toDate)));
-        return revenue.stream().map(rev -> rev.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return revenue.stream().map(Order::getCost).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
