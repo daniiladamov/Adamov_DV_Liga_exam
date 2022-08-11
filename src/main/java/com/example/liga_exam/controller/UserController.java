@@ -32,6 +32,13 @@ public class UserController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
 
+    /**
+     * Заказы пользователя
+     * @param id номер пользователя
+     * @param pageNumber номер страницы
+     * @param pageSize размер страницы
+     * @return список заказов пользователя
+     */
     @GetMapping("/{id}/orders")
     @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
     public Page<OrderResDto> getOrders(@PathVariable Long id, Integer pageNumber,
@@ -42,6 +49,13 @@ public class UserController {
         return orderService.getOrders(orderSpecification, pageable).map(o -> orderMapper.toResponse(o));
     }
 
+    /**
+     * Назначение пользователя работником
+     * @param dto модель работника
+     * @param id номер пользователя
+     * @return id номер вновь созданного работника
+     * @throws InvalidRoleValueException если у пользователя любая роль, кроме USER
+     */
     @PostMapping("/{id}/make-employee")
     @PreAuthorize("hasRole('ADMIN')")
     public Long makeEmployee(@Validated @RequestBody EmployeeDto dto, @PathVariable Long id)

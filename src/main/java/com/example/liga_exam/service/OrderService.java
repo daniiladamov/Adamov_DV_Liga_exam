@@ -18,8 +18,7 @@ import static com.example.liga_exam.entity.Order_.box;
 
 public interface OrderService {
 
-    String createOrder(Order order, Set<Operation> operations, User user)
-            throws AuthenticationException;
+    String createOrder(Order order, Set<Operation> operations, User user);
 
     Page<Order> getOrders(OrderSearch orderSearch, Pageable pageable,
                           Box box, User user);

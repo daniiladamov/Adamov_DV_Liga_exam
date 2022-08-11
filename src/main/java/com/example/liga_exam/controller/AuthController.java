@@ -23,6 +23,11 @@ public class AuthController {
     private final UserMapper userMapper;
     private final UserService userService;
 
+    /**
+     * Регистрация пользователя
+     * @param dto моедль регистрации пользователя
+     * @return номер id зарегистрированного пользователя
+     */
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
     public Long registration(@Validated @RequestBody UserRegisterDto dto) {
@@ -30,12 +35,22 @@ public class AuthController {
         return userService.createUser(user);
     }
 
+    /**
+     * Аутентификация пользователя
+     * @param dto модель аутентификации пользователя
+     * @return access и refresh токены
+     */
     @PostMapping("/login")
     public JwtResDto login(@Validated @RequestBody AuthDto dto) {
         authService.auth(dto.getUsername(), dto.getPassword());
         return jwtService.generateTokens(dto.getUsername());
     }
 
+    /**
+     * Обновление access токена
+     * @param dto refresh токен
+     * @return обновленные access и refresh токены
+     */
     @PostMapping("/jwt-refresh")
     public JwtResDto refreshAllTokens(@RequestBody JwtRefreshDto dto){
         String username= jwtService.validateJwtRefreshToken(dto.getRefreshToken());

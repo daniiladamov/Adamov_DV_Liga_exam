@@ -18,6 +18,11 @@ public class BoxController {
     private final BoxService boxService;
     private final BoxMapper boxMapper;
 
+    /**
+     * Создание нового бокса
+     * @param dto модель бокса
+     * @return номер id зарегистрированного бокса
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,6 +31,11 @@ public class BoxController {
         return boxService.createBox(box);
     }
 
+    /**
+     * Обновление параметров бокса
+     * @param id номер бокса
+     * @param dto модель бокса
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void updateBox(@PathVariable Long id, @Validated @RequestBody BoxReqDto dto) {

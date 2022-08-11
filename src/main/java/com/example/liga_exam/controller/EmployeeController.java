@@ -14,6 +14,11 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    /**
+     * Назначение допустимых пределов предоставляемой работником скидки
+     * @param dto модель скидки
+     * @param id номер работника
+     */
     @PatchMapping("/{id}/set-discount")
     @PreAuthorize("hasRole('ADMIN')")
     public void setDiscount(@Validated @RequestBody DiscountDto dto, @PathVariable Long id){

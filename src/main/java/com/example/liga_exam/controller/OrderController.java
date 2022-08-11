@@ -35,10 +35,14 @@ public class OrderController {
     private final AuthService authService;
     private final static String CONFIRM_REGISTRATION = "Запись подтверждена, номер заказа id=";
 
+    /**
+     * Создание заказа
+     * @param orderReqDto модель заказа
+     * @return ссылку на подтверждение брони заказа
+     */
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public String createOrder(@Validated @RequestBody OrderReqDto orderReqDto)
-            throws AuthenticationException {
+    public String createOrder(@Validated @RequestBody OrderReqDto orderReqDto) {
         Set<Operation> operationSet = operationService.getOperations(
                 orderReqDto.getServices().stream().map(o -> o.getId()).collect(Collectors.toSet()));
         Order order = orderMapper.toEntity(orderReqDto);
@@ -46,12 +50,24 @@ public class OrderController {
         return orderService.createOrder(order, operationSet, user);
     }
 
+    /**
+     * Подтверждение брони
+     * @param id номер заказа
+     * @return ссылку для подтверждения брони заказа
+     */
     @GetMapping("/{id}/confirm")
     public String confirmRegistration(@PathVariable Long id) {
         orderService.confirmOrder(id);
         return CONFIRM_REGISTRATION + id;
     }
 
+    /**
+     * Просмотр заказов
+     * @param pageSize размер страницы
+     * @param pageNumber номер страницы
+     * @param orderSearch модель фильтрации данных
+     * @return страницу с информацией о заказах
+     */
     @PostMapping("/filter")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public Page<OrderResDto> getOrders(Integer pageSize, Integer pageNumber,
@@ -63,12 +79,23 @@ public class OrderController {
                 .map(x -> orderMapper.toResponse(x));
     }
 
+    /**
+     * Выручка предприятия
+     * @param dto моедль периода времени
+     * @return выручку предприятия за указанный период
+     */
     @PostMapping("/revenue")
     @PreAuthorize("hasRole('ADMIN')")
     public BigDecimal getRevenue(@RequestBody PeriodDto dto) {
         return orderService.getRevenue(dto.getFromDate(), dto.getToDate());
     }
 
+    /**
+     * Подтверждение заблаговременного приезда клиента
+     * @param id номер заказа
+     * @throws AuthenticationException если приезд подтверждает кто-либо кроме самого пользователя, сделавшего заказ,
+     * работинка бокса, где оказывается услуга, или администратора
+     */
     @PatchMapping("/{id}/customer-arrived")
     public void customerArrivedInTime(@PathVariable Long id)
             throws AuthenticationException {
@@ -76,12 +103,26 @@ public class OrderController {
         orderService.arrived(id, user);
     }
 
+    /**
+     * Отмена заказа
+     * @param id номер заказа
+     * @throws AuthenticationException если отмену выполняет кто-либо кроме самого пользователя, сделавшего заказ,
+     * работинка бокса, где оказывается услуга, или администратора
+     */
     @PatchMapping("/{id}/cancel-order")
     public void canceledOrder(@PathVariable Long id) throws AuthenticationException {
         User user = userService.getUserByUsername(authService.getUsername());
         orderService.cancel(id, user);
     }
 
+    /**
+     * Изменение параметров заказа
+     * @param id номер заказа
+     * @param dto модель обновленной информации по заказу
+     * @return ссылку на подтверждение брони заказа
+     * @throws AuthenticationException если изменение заказа выполняет кто-либо кроме самого пользователя,
+     * сделавшего заказ, работинка бокса, где оказывается услуга, или администратора
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','USER')")
     public String changeOrder(@PathVariable Long id, @Validated @RequestBody OrderReqDto dto)
@@ -92,6 +133,14 @@ public class OrderController {
         return orderService.updateOrder(id, orderMapper.toEntity(dto), operationSet, user);
     }
 
+    /**
+     * Завершение заказа
+     * @param id номер заказа
+     * @param discount размер скидки (в %)
+     * @return итоговую стоимость заказа
+     * @throws AuthenticationException если завершение заказа выполняет кто-либо кром работинка бокса, где оказывается
+     * услуга, или администратора
+     */
     @PatchMapping("/{id}/done-order")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public BigDecimal doneOrder(@PathVariable Long id, Integer discount)

@@ -20,12 +20,24 @@ public class OperationController {
     private final OperationService operationService;
     private final OperationMapper operationMapper;
 
+    /**
+     * Создание предоставляемой услуги
+     * @param dto модель услуги
+     * @return номер id вновь созданной услуги
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Long createOperation(@Validated @RequestBody OperationRegisterDto dto) {
         Operation operation = operationMapper.toEntity(dto);
         return operationService.createService(operation);
     }
+
+    /**
+     * Список предоставляемых услуг
+     * @param pageNumber номер страницы
+     * @param pageSize размер старницы
+     * @return страницу предоставляемых услуг
+     */
     @GetMapping
     public Page<OperationResDto> getOperations(Integer pageNumber, Integer pageSize){
         Pageable pageable= Utils.getPageable(pageNumber, pageSize);
